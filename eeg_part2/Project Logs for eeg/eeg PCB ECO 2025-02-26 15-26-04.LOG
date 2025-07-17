@@ -1,0 +1,15 @@
+Removed Pin From Net: NetName=AGND Pin=C54-1
+Removed Pin From Net: NetName=AGND Pin=C55-1
+Removed Pin From Net: NetName=AVSS Pin=C55-2
+Removed Member From Class: ClassName=ads1299 Member=C55
+Change Component Comment : Designator=C54 Old Comment=100nF New Comment=1uF
+Added Pin To Net: NetName=AVSS Pin=C54-1
+Change Room Name: Old Name=RoomDefinition_3 New Name=ref
+Change Room Scope: Old Scope=InComponentClass('Room Definition 4') New Scope=InComponentClass('ref')
+Added Room: Name=ads1299
+Added Room: Name=communication
+Added Room: Name=mcu
+Added Room: Name=power_battery
+Added Room: Name=power_ic
+Added Room: Name=signal2
+Added Room: Name=signal3

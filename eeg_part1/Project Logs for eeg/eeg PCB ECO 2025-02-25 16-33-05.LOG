@@ -1,0 +1,9 @@
+Change Component Footprint: Designator=JP5 Old Footprint=PH2.0-W-2P New Footprint=PH2.0-L-2P
+Added Room: Name=ads1299
+Added Room: Name=communication
+Added Room: Name=mcu
+Added Room: Name=power_battery
+Added Room: Name=power_ic
+Added Room: Name=ref
+Added Room: Name=signal2
+Added Room: Name=signal3

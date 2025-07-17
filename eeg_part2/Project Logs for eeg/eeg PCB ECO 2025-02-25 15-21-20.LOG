@@ -1,0 +1,69 @@
+Removed Member From Class: ClassName=ads1299 Member=R80
+Removed Member From Class: ClassName=mcu Member=R80
+Removed Member From Class: ClassName=power_battery Member=R80
+Removed Member From Class: ClassName=ref Member=R80
+Removed Member From Class: ClassName=signal3 Member=R80
+Removed Member From Class: ClassName=ads1299 Member=R81
+Removed Member From Class: ClassName=mcu Member=R81
+Removed Member From Class: ClassName=power_battery Member=R81
+Removed Member From Class: ClassName=ref Member=R81
+Removed Member From Class: ClassName=signal3 Member=R81
+Removed Member From Class: ClassName=ads1299 Member=R82
+Removed Member From Class: ClassName=mcu Member=R82
+Removed Member From Class: ClassName=power_battery Member=R82
+Removed Member From Class: ClassName=ref Member=R82
+Removed Member From Class: ClassName=signal3 Member=R82
+Removed Member From Class: ClassName=ads1299 Member=R83
+Removed Member From Class: ClassName=power_battery Member=R83
+Removed Member From Class: ClassName=ref Member=R83
+Removed Member From Class: ClassName=signal3 Member=R83
+Change Component Footprint: Designator=R67 Old Footprint=R1206_L New Footprint=R0805_M
+Change Component Footprint: Designator=R68 Old Footprint=R1206_L New Footprint=R0805_M
+Added Member To Class: ClassName=signal3 Member=Component R42 0R
+Added Member To Class: ClassName=signal3 Member=Component R43 0R
+Added Member To Class: ClassName=signal3 Member=Component R44 0R
+Added Member To Class: ClassName=signal3 Member=Component R45 0R
+Added Member To Class: ClassName=signal3 Member=Component R46 5.1K
+Added Member To Class: ClassName=signal3 Member=Component R47 5.1K
+Added Member To Class: ClassName=signal3 Member=Component R48 5.1K
+Added Member To Class: ClassName=signal3 Member=Component R49 5.1K
+Added Member To Class: ClassName=ads1299 Member=Component R50 100K
+Added Member To Class: ClassName=ads1299 Member=Component R51 1M
+Added Member To Class: ClassName=ads1299 Member=Component R52 100K
+Added Member To Class: ClassName=ads1299 Member=Component R53 100K
+Added Member To Class: ClassName=ads1299 Member=Component R54 100K
+Added Member To Class: ClassName=ads1299 Member=Component R55 0R
+Added Member To Class: ClassName=ads1299 Member=Component R56 100K
+Added Member To Class: ClassName=ads1299 Member=Component R57 0R
+Added Member To Class: ClassName=ads1299 Member=Component R58 0R
+Added Member To Class: ClassName=ref Member=Component R59 2K
+Added Member To Class: ClassName=ref Member=Component R60 1K
+Added Member To Class: ClassName=ref Member=Component R61 47
+Added Member To Class: ClassName=ref Member=Component R62 20K 0.1%
+Added Member To Class: ClassName=ref Member=Component R63 20K 0.1%
+Added Member To Class: ClassName=mcu Member=Component R64 1K
+Added Member To Class: ClassName=mcu Member=Component R65 1K
+Added Member To Class: ClassName=mcu Member=Component R66 10K
+Added Member To Class: ClassName=power_battery Member=Component R67 0.05R
+Added Member To Class: ClassName=power_battery Member=Component R68 0.1R
+Added Member To Class: ClassName=power_battery Member=Component R69 471K
+Added Member To Class: ClassName=power_battery Member=Component R70 1K
+Added Member To Class: ClassName=power_battery Member=Component R71 1K
+Added Member To Class: ClassName=power_battery Member=Component R72 110K
+Added Member To Class: ClassName=power_battery Member=Component R73 10K/0.1%
+Added Member To Class: ClassName=power_battery Member=Component R74 15K
+Added Member To Class: ClassName=power_battery Member=Component R75 10K/0.1%
+Added Member To Class: ClassName=communication Member=Component R76 10K
+Added Member To Class: ClassName=communication Member=Component R77 10K
+Added Member To Class: ClassName=communication Member=Component R78 4.7K
+Added Member To Class: ClassName=communication Member=Component R79 4.7K
+Change Room Name: Old Name=RoomDefinition_5 New Name=signal1
+Change Room Scope: Old Scope=InComponentClass('Room Definition 12') New Scope=InComponentClass('signal1')
+Added Room: Name=ads1299
+Added Room: Name=communication
+Added Room: Name=mcu
+Added Room: Name=power_battery
+Added Room: Name=power_ic
+Added Room: Name=ref
+Added Room: Name=signal2
+Added Room: Name=signal3

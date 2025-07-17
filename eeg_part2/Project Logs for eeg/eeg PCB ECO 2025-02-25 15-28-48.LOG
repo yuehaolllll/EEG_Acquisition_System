@@ -1,0 +1,6 @@
+Added Component: Designator=CON1(DC-005)
+Add component (AddParameter): Name = "BOM名称"; Value = "DC电源接口"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "当前库版本V2024.2.3 @淘宝卖家:黄晶宝石"; Value = "最新版本发布https://item.taobao.com/item.htm?id=566775463719"; VariantName = "[No Variations]"
+Added Pin To Net: NetName=VCC12_from_dc Pin=CON1-1
+Added Pin To Net: NetName=GND Pin=CON1-2
+Added Member To Class: ClassName=power_battery Member=Component CON1 3.5*1.3

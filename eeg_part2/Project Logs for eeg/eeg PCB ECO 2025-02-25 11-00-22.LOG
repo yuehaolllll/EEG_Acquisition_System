@@ -1,0 +1,100 @@
+Removed Pin From Net: NetName=IN8_N Pin=JP2-1
+Removed Pin From Net: NetName=IN7_N Pin=JP2-3
+Removed Pin From Net: NetName=IN6_N Pin=JP2-5
+Removed Pin From Net: NetName=IN5_N Pin=JP2-7
+Change Component Designator: OldDesignator=R42 NewDesignator=R46
+Change Component Designator: OldDesignator=R43 NewDesignator=R47
+Change Component Designator: OldDesignator=R44 NewDesignator=R48
+Change Component Designator: OldDesignator=R45 NewDesignator=R49
+Change Component Designator: OldDesignator=R46 NewDesignator=R50
+Change Component Designator: OldDesignator=R47 NewDesignator=R51
+Change Component Designator: OldDesignator=R48 NewDesignator=R52
+Change Component Designator: OldDesignator=R49 NewDesignator=R53
+Change Component Designator: OldDesignator=R50 NewDesignator=R54
+Change Component Designator: OldDesignator=R51 NewDesignator=R55
+Change Component Designator: OldDesignator=R52 NewDesignator=R56
+Change Component Designator: OldDesignator=R53 NewDesignator=R57
+Change Component Designator: OldDesignator=R54 NewDesignator=R58
+Change Component Designator: OldDesignator=R55 NewDesignator=R59
+Change Component Designator: OldDesignator=R56 NewDesignator=R60
+Change Component Designator: OldDesignator=R57 NewDesignator=R61
+Change Component Designator: OldDesignator=R58 NewDesignator=R62
+Change Component Designator: OldDesignator=R59 NewDesignator=R63
+Change Component Designator: OldDesignator=R60 NewDesignator=R64
+Change Component Designator: OldDesignator=R61 NewDesignator=R65
+Change Component Designator: OldDesignator=R62 NewDesignator=R66
+Change Component Designator: OldDesignator=R63 NewDesignator=R67
+Change Component Designator: OldDesignator=R64 NewDesignator=R68
+Change Component Designator: OldDesignator=R65 NewDesignator=R69
+Change Component Designator: OldDesignator=R66 NewDesignator=R70
+Change Component Designator: OldDesignator=R67 NewDesignator=R71
+Change Component Designator: OldDesignator=R68 NewDesignator=R72
+Change Component Designator: OldDesignator=R69 NewDesignator=R73
+Change Component Designator: OldDesignator=R70 NewDesignator=R74
+Change Component Designator: OldDesignator=R71 NewDesignator=R75
+Change Component Designator: OldDesignator=R72 NewDesignator=R76
+Change Component Designator: OldDesignator=R73 NewDesignator=R77
+Change Component Designator: OldDesignator=R74 NewDesignator=R78
+Change Component Designator: OldDesignator=R75 NewDesignator=R79
+Change Component Designator: OldDesignator=R76 NewDesignator=R80
+Change Component Designator: OldDesignator=R77 NewDesignator=R81
+Change Component Designator: OldDesignator=R78 NewDesignator=R82
+Change Component Designator: OldDesignator=R79 NewDesignator=R83
+Added Component: Designator=R42(R0603_L)
+Add component (AddParameter): Name = "BOM名称"; Value = "贴片电阻"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "联系下单店铺卖家 免费帮你查找封装"; Value = "联系下单店铺卖家 免费技术指导"; VariantName = "[No Variations]"
+Added Component: Designator=R43(R0603_L)
+Add component (AddParameter): Name = "BOM名称"; Value = "贴片电阻"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "联系下单店铺卖家 免费帮你查找封装"; Value = "联系下单店铺卖家 免费技术指导"; VariantName = "[No Variations]"
+Added Component: Designator=R44(R0603_L)
+Add component (AddParameter): Name = "BOM名称"; Value = "贴片电阻"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "联系下单店铺卖家 免费帮你查找封装"; Value = "联系下单店铺卖家 免费技术指导"; VariantName = "[No Variations]"
+Added Component: Designator=R45(R0603_L)
+Add component (AddParameter): Name = "BOM名称"; Value = "贴片电阻"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "联系下单店铺卖家 免费帮你查找封装"; Value = "联系下单店铺卖家 免费技术指导"; VariantName = "[No Variations]"
+Added Pin To Net: NetName=IN8_N Pin=R42-2
+Added Pin To Net: NetName=IN7_N Pin=R43-2
+Added Pin To Net: NetName=IN6_N Pin=R44-2
+Added Pin To Net: NetName=IN5_N Pin=R45-2
+Change Net Name : Old Net Name=NetR48_1 New Net Name=NetR52_1
+Change Net Name : Old Net Name=NetR49_1 New Net Name=NetR53_1
+Change Net Name : Old Net Name=NetR50_1 New Net Name=NetR54_1
+Change Net Name : Old Net Name=NetR52_1 New Net Name=NetR56_1
+Change Net Name : Old Net Name=NetR58_1 New Net Name=NetR62_1
+Change Net Name : Old Net Name=NetR65_2 New Net Name=NetR69_2
+Change Net Name : Old Net Name=NetR68_1 New Net Name=NetR72_1
+Change Net Name : Old Net Name=NetR79_2 New Net Name=NetR83_2
+Added Pin To Net: NetName=NetJP2_1 Pin=JP2-1
+Added Pin To Net: NetName=NetJP2_1 Pin=R42-1
+Added Net: Name=NetJP2_1
+Added Pin To Net: NetName=NetJP2_3 Pin=JP2-3
+Added Pin To Net: NetName=NetJP2_3 Pin=R43-1
+Added Net: Name=NetJP2_3
+Added Pin To Net: NetName=NetJP2_5 Pin=JP2-5
+Added Pin To Net: NetName=NetJP2_5 Pin=R44-1
+Added Net: Name=NetJP2_5
+Added Pin To Net: NetName=NetJP2_7 Pin=JP2-7
+Added Pin To Net: NetName=NetJP2_7 Pin=R45-1
+Added Net: Name=NetJP2_7
+Added Pin To Net: NetName=NetR73_1 Pin=R73-1
+Added Pin To Net: NetName=NetR73_1 Pin=R75-2
+Added Net: Name=NetR73_1
+Added Member To Class: ClassName=signal3 Member=Component JP1 Header2X2
+Added Member To Class: ClassName=signal3 Member=Component JP2 Header 4X2
+Added Member To Class: ClassName=signal3 Member=Component R46 5.1K
+Added Member To Class: ClassName=signal3 Member=Component R47 5.1K
+Added Member To Class: ClassName=signal3 Member=Component R48 5.1K
+Added Member To Class: ClassName=signal3 Member=Component R49 5.1K
+Added Member To Class: ClassName=signal3 Member=Component U5 TPD4E1B06DCKR
+Added Member To Class: ClassName=signal3 Member=Component U7 TPD4E1B06DCKR
+Change Room Name: Old Name=RoomDefinition_2 New Name=signal1
+Change Room Scope: Old Scope=InComponentClass('Room Definition 3') New Scope=InComponentClass('signal1')
+Change Room Name: Old Name=RoomDefinition_3 New Name=ref
+Change Room Scope: Old Scope=InComponentClass('Room Definition 4') New Scope=InComponentClass('ref')
+Added Room: Name=ads1299
+Added Room: Name=communication
+Added Room: Name=mcu
+Added Room: Name=power_battery
+Added Room: Name=power_ic
+Added Room: Name=signal2
+Added Room: Name=signal3

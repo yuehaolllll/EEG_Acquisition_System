@@ -1,0 +1,9 @@
+Removed Pin From Net: NetName=NetC113_2 Pin=S1-1
+Removed Pin From Net: NetName=VCC_BAT Pin=S1-2
+Change Component Footprint: Designator=S1 Old Footprint=KCD1-101 New Footprint=SS-12D10
+Change Component Comment : Designator=S1 Old Comment=KCD1-101 New Comment=SS-12F23
+Change component parameters: Designator = "S1" ("S1"); Footprint = "KCD1-101"; UniqueID = "\KSBTHGSH" ("\KSBTHGSH")
+Change component parameters (AddParameter): Name = "BOM名称"; Value = "波动开关"; VariantName = "[No Variations]"
+Change component parameters (AddParameter): Name = "联系下单店铺卖家 免费技术支持"; Value = "联系下单店铺卖家 免费帮你查找封装"; VariantName = "[No Variations]"
+Added Pin To Net: NetName=VCC_BAT Pin=S1-1
+Added Pin To Net: NetName=NetC113_2 Pin=S1-2

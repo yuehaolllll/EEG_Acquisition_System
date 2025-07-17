@@ -1,0 +1,19 @@
+Added Component: Designator=U19(DIP-8)
+Add component (AddParameter): Name = "联系卖家 免费查找封装"; Value = "唯一出售店铺网址https://shop463601444.taobao.com"; VariantName = "[No Variations]"
+Added Pin To Net: NetName=BAT_Volatge_in Pin=U19-1
+Added Pin To Net: NetName=BAT_Volatge_in Pin=U19-2
+Added Pin To Net: NetName=NetR73_1 Pin=U19-3
+Added Pin To Net: NetName=GND Pin=U19-4
+Added Pin To Net: NetName=GND Pin=U19-5
+Added Pin To Net: NetName=NetU19_6 Pin=U19-6
+Added Pin To Net: NetName=NetU19_6 Pin=U19-7
+Added Pin To Net: NetName=VCC5 Pin=U19-8
+Added Member To Class: ClassName=power_battery Member=Component U19 LM358_NSC
+Added Room: Name=ads1299
+Added Room: Name=communication
+Added Room: Name=mcu
+Added Room: Name=power_battery
+Added Room: Name=power_ic
+Added Room: Name=ref
+Added Room: Name=signal2
+Added Room: Name=signal3

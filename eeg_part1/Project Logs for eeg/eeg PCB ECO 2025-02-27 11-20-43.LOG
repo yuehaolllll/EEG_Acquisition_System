@@ -1,0 +1,12 @@
+Removed Pin From Net: NetName=SPI3_MISO Pin=JP9-2
+Removed Pin From Net: NetName=SPI3_CLK Pin=JP9-3
+Added Pin To Net: NetName=SPI3_CLK Pin=JP9-2
+Added Pin To Net: NetName=SPI3_MISO Pin=JP9-3
+Added Room: Name=ads1299
+Added Room: Name=communication
+Added Room: Name=mcu
+Added Room: Name=power_battery
+Added Room: Name=power_ic
+Added Room: Name=signal1
+Added Room: Name=signal2
+Added Room: Name=signal3

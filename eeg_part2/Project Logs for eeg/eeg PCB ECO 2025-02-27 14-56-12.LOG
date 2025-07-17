@@ -1,0 +1,14 @@
+Added Component: Designator=R84(R1206_L)
+Add component (AddParameter): Name = "BOM名称"; Value = "贴片电阻"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "联系下单店铺卖家 免费帮你查找封装"; Value = "联系下单店铺卖家 免费技术指导"; VariantName = "[No Variations]"
+Added Pin To Net: NetName=AGND Pin=R84-1
+Added Pin To Net: NetName=GND Pin=R84-2
+Added Member To Class: ClassName=power_ic Member=Component R84 0R
+Added Room: Name=ads1299
+Added Room: Name=communication
+Added Room: Name=mcu
+Added Room: Name=power_battery
+Added Room: Name=power_ic
+Added Room: Name=signal1
+Added Room: Name=signal2
+Added Room: Name=signal3

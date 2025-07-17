@@ -1,0 +1,8 @@
+Removed Pin From Net: NetName=AVDD Pin=U10-52
+Added Pin To Net: NetName=VCC3_3 Pin=U10-52
+Added Room: Name=ads1299
+Added Room: Name=power_ic
+Added Room: Name=ref
+Added Room: Name=signal1
+Added Room: Name=signal2
+Added Room: Name=signal3

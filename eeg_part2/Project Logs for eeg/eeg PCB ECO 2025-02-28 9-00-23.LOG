@@ -1,0 +1,13 @@
+Removed Pin From Net: NetName=VCC3_3 Pin=R78-1
+Removed Pin From Net: NetName=VCC3_3 Pin=R79-1
+Added Pin To Net: NetName=VCC3_3_WIFI Pin=R78-1
+Added Pin To Net: NetName=VCC3_3_WIFI Pin=R79-1
+Added Room: Name=ads1299
+Added Room: Name=communication
+Added Room: Name=mcu
+Added Room: Name=power_battery
+Added Room: Name=power_ic
+Added Room: Name=ref
+Added Room: Name=signal1
+Added Room: Name=signal2
+Added Room: Name=signal3

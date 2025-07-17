@@ -1,0 +1,199 @@
+Altium Designer Pick and Place Locations
+C:\Users\12507\Desktop\pcb\eeg_hardware\eeg_board_v2.0\eeg_part1\Project Outputs for eeg\Pick Place for eeg.txt
+
+========================================================================================================================
+File Design Information:
+
+Date:       11-06-25
+Time:       15:00
+Revision:   Not in VersionControl
+Variant:    No variations
+Units used: mm
+
+Designator Comment       Layer       Footprint       Center-X(mm) Center-Y(mm) Rotation Description                                      
+C67        1uF           TopLayer    C0603_L         115.8240     30.0990      270      贴片电容/MLCC电容                                      
+JP4        HDR-1X10      BottomLayer HDR2.54-LI-10P  121.2850     62.7380      90       10P接插件                                           
+U11        REF5025AIDR   TopLayer    SOIC-8          110.9524     29.9955      180      "2.5V、3μVpp/V 噪声、3ppm/°C 温漂、精密串联电压基准"            
+R58        0R_N          TopLayer    R0603_L         50.8000      91.1860      90       贴片电阻                                             
+R53        1MR           TopLayer    R0603_L         46.2280      93.9800      270      贴片电阻                                             
+R47        0R            TopLayer    R0603_L         49.2760      91.1860      90       贴片电阻                                             
+R46        100K          TopLayer    R0603_L         49.2760      93.9800      90       贴片电阻                                             
+R33        "5.49K 0,01%" TopLayer    R0603_M         47.8036      87.9988      270      贴片电阻                                             
+R32        "5.49K 0,01%" TopLayer    R0603_M         46.2796      87.9986      90       贴片电阻                                             
+R23        "5.49K 0,01%" TopLayer    R0603_M         47.6250      76.4541      270      贴片电阻                                             
+R22        "5.49K 0,01%" TopLayer    R0603_M         46.2280      76.4539      90       贴片电阻                                             
+R13        "5.49K 0,01%" TopLayer    R0603_M         47.4980      65.5321      270      贴片电阻                                             
+R12        "5.49K 0,01%" TopLayer    R0603_M         46.1010      65.5319      90       贴片电阻                                             
+R3         "5.49K 0,01%" TopLayer    R0603_M         47.4980      54.4831      270      贴片电阻                                             
+C49        1.5nF         TopLayer    C0603_L         47.7520      93.9800      90       贴片电容/MLCC电容                                      
+R72        0R            TopLayer    R1206_L         106.5530     74.8030      0        贴片电阻                                             
+R51        0R_N          TopLayer    R0603_L         41.1480      52.4510      270      贴片电阻                                             
+R50        0R_N          TopLayer    R0603_L         41.2750      63.7540      270      贴片电阻                                             
+R49        0R_N          TopLayer    R0603_L         41.2643      74.5773      270      贴片电阻                                             
+R48        0R_N          TopLayer    R0603_L         41.0210      86.1060      270      贴片电阻                                             
+U5         TPD4E1B06DCKR TopLayer    SOT363_N        33.9090      91.1860      180      "具有 0.5nA 最大泄漏电流的四路 0.7pF、±5.5V、±12kV ESD 保护二极管" 
+JP1        Header2X2     TopLayer    HDR2.54-WI-2x2P 29.3370      91.0590      270      2*2P接插件                                          
+U16        TPS72325DBVT  TopLayer    SOT23-5         95.7580      89.2845      180      "200mA 负输出低压降线性稳压器 5-SOT-23 -40 to 125"          
+U15        TPS60403DBVR  TopLayer    SOT23-5         105.2830     89.0236      0        "60mA 充电泵电压反向器 250khz"                           
+U14        TPS73225DBVR  TopLayer    SOT23-5         101.9350     81.0295      180      "2.5V输出LDO 30uVRMS 精度1%"                         
+U13        OPA388        TopLayer    SOIC-8          103.7590     43.4340      90       "OPA388 单路、10MHz、CMOS、零温漂、零交叉、真 RRIO 精密运算放大器"    
+U12        OPA388        TopLayer    SOIC-8          98.4250      30.0990      180      "OPA388 单路、10MHz、CMOS、零温漂、零交叉、真 RRIO 精密运算放大器"    
+U10        ADS1299IPAGR  TopLayer    TQFP64_N        92.0470      63.0300      0        "24位、多通道EEG/ECG ADC，内置增益放大"                      
+U9         TPD4E1B06DCKR TopLayer    SOT363_N        34.0360      32.1310      180      "具有 0.5nA 最大泄漏电流的四路 0.7pF、±5.5V、±12kV ESD 保护二极管" 
+U8         TPD4E1B06DCKR TopLayer    SOT363_N        34.0360      41.4020      180      "具有 0.5nA 最大泄漏电流的四路 0.7pF、±5.5V、±12kV ESD 保护二极管" 
+U7         TPD4E1B06DCKR TopLayer    SOT363_N        38.3540      68.4530      180      "具有 0.5nA 最大泄漏电流的四路 0.7pF、±5.5V、±12kV ESD 保护二极管" 
+U6         TPD4E1B06DCKR TopLayer    SOT363_N        38.3540      73.7870      180      "具有 0.5nA 最大泄漏电流的四路 0.7pF、±5.5V、±12kV ESD 保护二极管" 
+U4         INA333AIDGKR  TopLayer    MSOP8_N         46.9900      84.8360      270      "INA333 低功耗、零漂移、精密仪表放大器"                         
+U3         INA333AIDGKR  TopLayer    MSOP8_N         46.8630      73.3320      270      "INA333 低功耗、零漂移、精密仪表放大器"                         
+U2         INA333AIDGKR  TopLayer    MSOP8_N         46.8630      62.3570      270      "INA333 低功耗、零漂移、精密仪表放大器"                         
+U1         INA333AIDGKR  TopLayer    MSOP8_N         46.8630      51.1810      270      "INA333 低功耗、零漂移、精密仪表放大器"                         
+R71        "20K 0.1%"    TopLayer    R0603_L         103.1240     37.8460      90       贴片电阻                                             
+R70        "20K 0.1%"    TopLayer    R0603_L         107.3150     43.6880      90       贴片电阻                                             
+R69        47            TopLayer    R0603_L         92.9640      30.8610      180      贴片电阻                                             
+R68        1K            TopLayer    R0603_L         103.8860     32.1310      180      贴片电阻                                             
+R67        2K            TopLayer    R0603_L         98.4773      35.1782      180      贴片电阻                                             
+R66        0R_N          TopLayer    R0603_L         95.3770      43.6880      0        贴片电阻                                             
+R65        0R            TopLayer    R0603_L         93.2180      43.0160      270      贴片电阻                                             
+R64        100K          TopLayer    R0603_L         104.3940     64.2620      0        贴片电阻                                             
+R63        0R            TopLayer    R0603_L         91.7148      43.0191      270      贴片电阻                                             
+R62        100K          TopLayer    R0603_L         101.6000     64.2620      0        贴片电阻                                             
+R61        100K          TopLayer    R0603_L         104.4310     65.7860      0        贴片电阻                                             
+R60        100K          TopLayer    R0603_L         101.6000     65.7860      0        贴片电阻                                             
+R59        1M            TopLayer    R0603_L         86.8680      72.1360      0        贴片电阻                                             
+R57        100K          TopLayer    R0603_L         84.0740      72.1360      180      贴片电阻                                             
+R56        5.1K          TopLayer    R0603_L         39.8780      29.0830      0        贴片电阻                                             
+R55        5.1K          TopLayer    R0603_L         39.8780      30.6070      0        贴片电阻                                             
+R54        5.1K          TopLayer    R0603_L         48.5140      33.5280      0        贴片电阻                                             
+R52        5.1K          TopLayer    R0603_L         48.5140      35.0520      0        贴片电阻                                             
+R45        5.1K          TopLayer    R0603_L         39.8780      38.2270      0        贴片电阻                                             
+R44        5.1K          TopLayer    R0603_L         39.8780      39.7510      0        贴片电阻                                             
+R43        5.1K          TopLayer    R0603_L         48.4240      41.4020      0        贴片电阻                                             
+R42        0R            TopLayer    R0603_L         38.8620      97.4090      180      贴片电阻                                             
+R41        5.1K          TopLayer    R0603_L         48.4240      42.9260      0        贴片电阻                                             
+R40        "470K 1%"     TopLayer    R0603_L         72.6440      83.9470      270      贴片电阻                                             
+R39        "330K 1%"     TopLayer    R0603_L         52.8320      82.4600      90       贴片电阻                                             
+R38        "10K 1%"      TopLayer    R0603_L         60.4520      84.5820      180      贴片电阻                                             
+R37        "10K 1%"      TopLayer    R0603_L         57.6580      84.5820      180      贴片电阻                                             
+R36        "20K 1%"      TopLayer    R0603_L         67.0560      87.5030      180      贴片电阻                                             
+R35        0R            TopLayer    R0603_L         74.8030      84.5820      180      贴片电阻                                             
+R34        0R            TopLayer    R0603_L         42.5450      86.1060      270      贴片电阻                                             
+R31        2M            TopLayer    R0603_L         66.2940      80.3910      180      贴片电阻                                             
+R30        "470K 1%"     TopLayer    R0603_L         72.5170      72.4430      270      贴片电阻                                             
+R29        "330K 1%"     TopLayer    R0603_L         52.7050      70.9560      90       贴片电阻                                             
+R28        "10K 1%"      TopLayer    R0603_L         60.2880      73.0780      180      贴片电阻                                             
+R27        "10K 1%"      TopLayer    R0603_L         57.4940      73.0780      180      贴片电阻                                             
+R26        "20K 1%"      TopLayer    R0603_L         66.9290      75.9990      180      贴片电阻                                             
+R25        0R            TopLayer    R0603_L         74.6390      73.2050      180      贴片电阻                                             
+R24        0R            TopLayer    R0603_L         42.6720      74.6020      270      贴片电阻                                             
+R21        2M            TopLayer    R0603_L         66.1670      68.8870      180      贴片电阻                                             
+R20        "470K 1%"     TopLayer    R0603_L         72.5170      61.4680      270      贴片电阻                                             
+R19        "330K 1%"     TopLayer    R0603_L         52.7050      59.9810      90       贴片电阻                                             
+R18        "10K 1%"      TopLayer    R0603_L         60.3250      62.1030      180      贴片电阻                                             
+R17        "10K 1%"      TopLayer    R0603_L         57.5310      62.1030      180      贴片电阻                                             
+R16        "20K 1%"      TopLayer    R0603_L         66.9290      65.0240      180      贴片电阻                                             
+R15        0R            TopLayer    R0603_L         74.6390      62.2300      180      贴片电阻                                             
+R14        0R            TopLayer    R0603_L         42.6720      63.7540      270      贴片电阻                                             
+R11        2M            TopLayer    R0603_L         66.1670      57.9120      180      贴片电阻                                             
+R10        "470K 1%"     TopLayer    R0603_L         72.5170      50.2920      270      贴片电阻                                             
+R9         "330K 1%"     TopLayer    R0603_L         52.7050      48.8050      90       贴片电阻                                             
+R8         "10K 1%"      TopLayer    R0603_L         60.2880      50.9270      180      贴片电阻                                             
+R7         "10K 1%"      TopLayer    R0603_L         57.4940      50.9270      180      贴片电阻                                             
+R6         "20K 1%"      TopLayer    R0603_L         66.9290      53.8480      180      贴片电阻                                             
+R5         0R            TopLayer    R0603_L         74.6390      51.0540      180      贴片电阻                                             
+R4         0R            TopLayer    R0603_L         42.6720      52.4510      270      贴片电阻                                             
+R2         "5.49K 0,01%" TopLayer    R0603_M         46.1010      54.4829      90       贴片电阻                                             
+R1         2M            TopLayer    R0603_L         66.1670      46.7360      180      贴片电阻                                             
+L2         3.3uH         TopLayer    L0805           90.4240      89.8179      180      贴片小功率电感                                          
+L1         3.3uH         TopLayer    L0805           95.1230      80.1405      180      贴片小功率电感                                          
+JP3        "Header 4X2"  TopLayer    HDR2.54-WI-2x4P 28.8290      38.9890      270      4*2P接插件                                          
+JP2        "Header 4X2"  TopLayer    HDR2.54-WI-2x4P 29.3370      71.2470      270      4*2P接插件                                          
+IC5        ADA4522-2ARZ  TopLayer    SOIC-8          40.7670      93.8530      0        双通道55V、EMI增强型、零漂移、超低噪声、RRO运算放大器                  
+IC4        ADA4522-2ARZ  TopLayer    SOIC-8          66.1670      83.9470      0        双通道55V、EMI增强型、零漂移、超低噪声、RRO运算放大器                  
+IC3        ADA4522-2ARZ  TopLayer    SOIC-8          66.0400      72.4430      0        双通道55V、EMI增强型、零漂移、超低噪声、RRO运算放大器                  
+IC2        ADA4522-2ARZ  TopLayer    SOIC-8          66.0400      61.4680      0        双通道55V、EMI增强型、零漂移、超低噪声、RRO运算放大器                  
+IC1        ADA4522-2ARZ  TopLayer    SOIC-8          66.0400      50.2920      0        双通道55V、EMI增强型、零漂移、超低噪声、RRO运算放大器                  
+C87        10nF          TopLayer    C0603_L         95.2500      91.9515      0        贴片电容/MLCC电容                                      
+C86        2.2uF         TopLayer    C0603_L         98.5520      88.5190      90       贴片电容/MLCC电容                                      
+C85        10uF          TopLayer    C0603_L         87.8840      90.5798      90       贴片电容/MLCC电容                                      
+C84        10uF          TopLayer    C0603_L         92.9640      90.5798      90       贴片电容/MLCC电容                                      
+C83        2.2uF         TopLayer    C0603_L         92.9640      87.6335      90       贴片电容/MLCC电容                                      
+C82        1uF           TopLayer    C0603_L         104.7750     86.4836      0        贴片电容/MLCC电容                                      
+C81        1uF           TopLayer    C0603_L         102.4890     87.8806      90       贴片电容/MLCC电容                                      
+C80        1uF           TopLayer    C0603_L         102.4890     90.6746      90       贴片电容/MLCC电容                                      
+C79        10nF          TopLayer    C0603_L         101.4730     83.5695      0        贴片电容/MLCC电容                                      
+C78        10uF          TopLayer    C0603_L         92.5830      80.8655      90       贴片电容/MLCC电容                                      
+C77        10uF          TopLayer    C0603_L         97.6630      80.7755      90       贴片电容/MLCC电容                                      
+C76        2.2uF         TopLayer    C0603_L         99.1870      80.7755      270      贴片电容/MLCC电容                                      
+C75        2.2uF         TopLayer    C0603_L         104.7750     80.7755      270      贴片电容/MLCC电容                                      
+C74        100nF         TopLayer    C0603_L         106.4260     38.6080      180      贴片电容/MLCC电容                                      
+C73        100nF         TopLayer    C0603_L         102.2350     48.2600      0        贴片电容/MLCC电容                                      
+C72        1uF           TopLayer    C0603_L         106.0450     32.6390      270      贴片电容/MLCC电容                                      
+C71        10uF          TopLayer    C0603_L         90.8050      30.0990      270      贴片电容/MLCC电容                                      
+C70        100nF         TopLayer    C0603_L         89.2810      30.0990      270      贴片电容/MLCC电容                                      
+C69        10uF          TopLayer    C0603_L         103.2510     29.9720      90       贴片电容/MLCC电容                                      
+C68        10uF          TopLayer    C0603_L         106.0450     29.8450      90       贴片电容/MLCC电容                                      
+C66        100nF         TopLayer    C0603_L         93.4720      28.7020      270      贴片电容/MLCC电容                                      
+C65        150nF         TopLayer    C0603_L         98.4620      33.6550      180      贴片电容/MLCC电容                                      
+C64        1uF           TopLayer    C0603_L         97.6630      54.9910      180      贴片电容/MLCC电容                                      
+C63        100uF         TopLayer    C1206_L         96.5200      51.6890      270      贴片电容/MLCC电容                                      
+C62        1uF           TopLayer    C0603_L         94.4880      53.0860      90       贴片电容/MLCC电容                                      
+C61        100nF         TopLayer    C0603_L         92.3290      53.9750      180      贴片电容/MLCC电容                                      
+C60        10uF          TopLayer    C0603_L         92.3290      52.4510      180      贴片电容/MLCC电容                                      
+C59        1uF           TopLayer    C0603_L         87.6300      54.1020      180      贴片电容/MLCC电容                                      
+C58        1uF           TopLayer    C0603_L         89.7890      73.2790      180      贴片电容/MLCC电容                                      
+C56        1uF           TopLayer    C0603_L         98.4250      70.6120      180      贴片电容/MLCC电容                                      
+C57        1uF           TopLayer    C0603_L         89.7890      53.1760      90       贴片电容/MLCC电容                                      
+C55        1uF           TopLayer    C0603_L         93.9800      71.5010      180      贴片电容/MLCC电容                                      
+C54        1uF           TopLayer    C0603_L         92.0750      73.5330      270      贴片电容/MLCC电容                                      
+C53        100nF         TopLayer    C0603_L         93.5990      73.5330      270      贴片电容/MLCC电容                                      
+C52        1.5nF         TopLayer    C0603_L         86.9050      73.6600      180      贴片电容/MLCC电容                                      
+C51        4.7nF         TopLayer    C0603_L         42.0370      28.3210      270      贴片电容/MLCC电容                                      
+C50        4.7nF         TopLayer    C0603_L         42.0370      31.3690      270      贴片电容/MLCC电容                                      
+C48        4.7nF         TopLayer    C0603_L         50.6730      32.7660      270      贴片电容/MLCC电容                                      
+C47        4.7nF         TopLayer    C0603_L         50.6730      35.8140      270      贴片电容/MLCC电容                                      
+C46        4.7nF         TopLayer    C0603_L         42.0370      37.4650      270      贴片电容/MLCC电容                                      
+C45        4.7nF         TopLayer    C0603_L         42.0370      40.5130      270      贴片电容/MLCC电容                                      
+C44        100nF         TopLayer    C0603_L         38.8620      90.2970      0        贴片电容/MLCC电容                                      
+C43        4.7nF         TopLayer    C0603_L         50.6090      40.6635      270      贴片电容/MLCC电容                                      
+C42        4.7nF         TopLayer    C0603_L         50.5830      43.6880      270      贴片电容/MLCC电容                                      
+C41        100nF         TopLayer    C0603_L         42.7990      97.4090      180      贴片电容/MLCC电容                                      
+C40        100nF         TopLayer    C0603_L         45.3390      82.5500      180      贴片电容/MLCC电容                                      
+C39        1nF           TopLayer    C0603_L         71.1200      83.9470      90       贴片电容/MLCC电容                                      
+C38        100nF         TopLayer    C0603_L         62.7380      80.3910      180      贴片电容/MLCC电容                                      
+C37        100nF         TopLayer    C0603_L         61.2140      82.4600      90       贴片电容/MLCC电容                                      
+C36        10uF          TopLayer    C0603_L         54.8640      84.5820      0        贴片电容/MLCC电容                                      
+C35        4.7uF         TopLayer    C0603_L         52.0700      84.5820      0        贴片电容/MLCC电容                                      
+C34        10uF          TopLayer    C0603_L         64.2620      87.5030      0        贴片电容/MLCC电容                                      
+C33        100nF         TopLayer    C0603_L         51.4350      86.6140      270      贴片电容/MLCC电容                                      
+C32        100nF         TopLayer    C0603_L         69.8500      87.5030      0        贴片电容/MLCC电容                                      
+C31        10nF          TopLayer    C0603_L         66.2940      78.8670      0        贴片电容/MLCC电容                                      
+C30        100nF         TopLayer    C0603_L         45.1750      71.0460      180      贴片电容/MLCC电容                                      
+C29        1nF           TopLayer    C0603_L         70.9930      72.4430      90       贴片电容/MLCC电容                                      
+C28        100nF         TopLayer    C0603_L         62.6110      68.8870      180      贴片电容/MLCC电容                                      
+C27        100nF         TopLayer    C0603_L         61.0870      70.9560      90       贴片电容/MLCC电容                                      
+C26        10uF          TopLayer    C0603_L         54.7370      73.0780      0        贴片电容/MLCC电容                                      
+C25        4.7uF         TopLayer    C0603_L         51.9430      73.0780      0        贴片电容/MLCC电容                                      
+C24        10uF          TopLayer    C0603_L         64.1350      75.9990      0        贴片电容/MLCC电容                                      
+C23        100nF         TopLayer    C0603_L         51.3080      75.2000      270      贴片电容/MLCC电容                                      
+C22        100nF         TopLayer    C0603_L         69.7230      75.9990      0        贴片电容/MLCC电容                                      
+C21        10nF          TopLayer    C0603_L         66.1670      67.3630      0        贴片电容/MLCC电容                                      
+C20        100nF         TopLayer    C0603_L         45.0850      60.0710      180      贴片电容/MLCC电容                                      
+C19        1nF           TopLayer    C0603_L         70.9930      61.4680      90       贴片电容/MLCC电容                                      
+C18        100nF         TopLayer    C0603_L         62.6110      57.9120      180      贴片电容/MLCC电容                                      
+C17        100nF         TopLayer    C0603_L         60.9600      60.0710      90       贴片电容/MLCC电容                                      
+C16        10uF          TopLayer    C0603_L         54.7000      62.1030      0        贴片电容/MLCC电容                                      
+C15        4.7uF         TopLayer    C0603_L         51.9430      62.1030      0        贴片电容/MLCC电容                                      
+C14        10uF          TopLayer    C0603_L         64.1350      65.0240      0        贴片电容/MLCC电容                                      
+C13        100nF         TopLayer    C0603_L         51.3080      64.2620      270      贴片电容/MLCC电容                                      
+C12        100nF         TopLayer    C0603_L         69.7230      65.0240      0        贴片电容/MLCC电容                                      
+C11        10nF          TopLayer    C0603_L         66.1670      56.3880      0        贴片电容/MLCC电容                                      
+C10        100nF         TopLayer    C0603_L         45.1750      48.8950      180      贴片电容/MLCC电容                                      
+C9         1nF           TopLayer    C0603_L         70.9930      50.2920      90       贴片电容/MLCC电容                                      
+C8         100nF         TopLayer    C0603_L         62.6110      46.7360      180      贴片电容/MLCC电容                                      
+C7         100nF         TopLayer    C0603_L         61.0870      48.8050      90       贴片电容/MLCC电容                                      
+C6         10uF          TopLayer    C0603_L         54.7370      50.9270      0        贴片电容/MLCC电容                                      
+C5         4.7uF         TopLayer    C0603_L         51.9430      50.9270      0        贴片电容/MLCC电容                                      
+C4         10uF          TopLayer    C0603_L         64.1350      53.8480      0        贴片电容/MLCC电容                                      
+C3         100nF         TopLayer    C0603_L         51.3080      53.0490      270      贴片电容/MLCC电容                                      
+C2         100nF         TopLayer    C0603_L         69.7230      53.8480      0        贴片电容/MLCC电容                                      
+C1         10nF          TopLayer    C0603_L         66.1670      45.2120      0        贴片电容/MLCC电容                                      

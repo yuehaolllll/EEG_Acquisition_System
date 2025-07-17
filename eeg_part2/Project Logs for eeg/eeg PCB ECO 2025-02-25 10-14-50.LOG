@@ -1,0 +1,29 @@
+Removed Pin From Net: NetName=REF_CAP Pin=JP3-2
+Removed Pin From Net: NetName=RL_CAP Pin=JP3-4
+Removed Pin From Net: NetName=AGND Pin=U9-3
+Removed Pin From Net: NetName=REF_CAP Pin=U9-4
+Removed Pin From Net: NetName=RL_CAP Pin=U9-5
+Removed Member From Class: ClassName=signal3 Member=JP3
+Removed Member From Class: ClassName=signal3 Member=U9
+Added Component: Designator=JP?(HDR2.54-WI-2x2P)
+Add component (AddParameter): Name = "BOM名称"; Value = "2*2P接插件"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "封装库来自淘宝卖家ID：黄晶宝石"; Value = "其他店铺购入均为盗版封装库，请立即申请退款，本店现金奖励50~200元"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "联系卖家，免费查找封装"; Value = "唯一出售店铺网址https://shop463601444.taobao.com"; VariantName = "[No Variations]"
+Added Component: Designator=U?(SOT363_N)
+Add component (AddParameter): Name = "jlc_id"; Value = "C840093"; VariantName = "[No Variations]"
+Added Pin To Net: NetName=REF_CAP Pin=JP?-2
+Added Pin To Net: NetName=RL_CAP Pin=JP?-4
+Added Pin To Net: NetName=AGND Pin=U?-3
+Added Pin To Net: NetName=REF_CAP Pin=U?-4
+Added Pin To Net: NetName=RL_CAP Pin=U?-5
+Added Member To Class: ClassName=signal3 Member=Component JP? Header2X2
+Added Member To Class: ClassName=signal3 Member=Component U? TPD4E1B06DCKR
+Added Room: Name=ads1299
+Added Room: Name=communication
+Added Room: Name=mcu
+Added Room: Name=power_battery
+Added Room: Name=power_ic
+Added Room: Name=ref
+Added Room: Name=signal1
+Added Room: Name=signal2
+Added Room: Name=signal3
