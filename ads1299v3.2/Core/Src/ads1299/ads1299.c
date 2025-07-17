@@ -118,7 +118,7 @@ void ADS1299_Init(ADS1299_Handle_t *dev) {
     printf("Init: Step 3 - Configuring registers...\r\n");
     ADS1299_WriteRegister(dev, ADS1299_REG_CONFIG1, 0xB6);  		// enable interanl clock
     ADS1299_WriteRegister(dev, ADS1299_REG_CONFIG2, 0xC0);  		// normal input 
-    ADS1299_WriteRegister(dev, ADS1299_REG_CONFIG3, 0x6C);  		// external VREF and open BIAS
+    ADS1299_WriteRegister(dev, ADS1299_REG_CONFIG3, 0xEC);  		// external VREF and open BIAS
 		ADS1299_WriteRegister(dev, ADS1299_REG_MISC1,   0x20); 			// all Channel-N connect to SRB1
 //    ADS1299_WriteRegister(dev, ADS1299_REG_LOFF, 0x00);       // no loff detect	
 		ADS1299_WriteRegister(dev, ADS1299_REG_BIAS_SENSP, 0x0F); 	// 1-4 channel connect to bias-P
