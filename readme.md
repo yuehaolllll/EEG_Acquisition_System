@@ -25,11 +25,11 @@
 *文件eeg_realtime_plot_v2.0.py则是接收前端采集信号的python脚本代码，其中的配置需结合前端采集模式进行灵活修改。该代码实现实时的信号接收、压值转换、滤波（高通滤波、陷波滤波与滑动窗口滤波）、保存与绘制。*  
 #  2、System Performance Evaluation
 ###  internal test signal
-![alt text](images/test_signal.png)
+![alt text](images/test_signal.png)  
 *从这张图片可以看出内部测试信号可以完美的采集到，并且噪音小，幅度吻合*  
 ###  shorted input to get background noise
-![alt text](images/background_noise.png)
+![alt text](images/background_noise.png)  
 *根据参考手册的提示，在输入短路模式下所采集到的信号为系统的本底噪声。在增益为24，±2.5V参考电压的背景下，系统的本底噪声处于1uV的范围内，性能还算可以*  
 ###  ECG test
-![alt text](images/ECG.png)
+![alt text](images/ECG.png)  
 *如图所示的通道一为采集到的心电信号波形图。心电信号主要由P波（心房收缩）、QRS波群（心室收缩）和T波（心室舒张）组成，幅度范围为-0.5mV到+2.0mV之间。经验证该信通可以采集较为精确心电信号*  
