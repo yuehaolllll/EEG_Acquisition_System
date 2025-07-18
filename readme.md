@@ -1,4 +1,4 @@
-# 1、EEG Acquisition system decription
+# 1、EEG Acquisition System Description
 *本EEG信号采集系统采用STM32F405RGT6作为主控，模数转换芯片采用TI的具有高精度8通道的ADS1299，另外结合WiFi模块用于传输数据。本系统采用外部±2.5V参考电压，最多支持24通道，采用级联法：共用SPI接口，3个CS片选引脚。*  
 *MOSI：PB15 (SPI2)*  
 *MISO：PB14 (SPI2)*  
