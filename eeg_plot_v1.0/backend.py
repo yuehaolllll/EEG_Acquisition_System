@@ -30,6 +30,7 @@ SAMPLES_PER_FILE = SAMPLES_PER_SECOND * SAVE_DURATION_S
 
 # --- filter config ---
 HIGHPASS_CUTOFF = 0.5
+LOWPASS_CUTOFF = 100.0
 FILTER_ORDER = 4
 NOTCH_FREQ = 50.0
 NOTCH_QUALITY_FACTOR = 30.0
@@ -101,12 +102,13 @@ def filter_worker(raw_data_queue, filtered_data_queues, storage_queue, command_q
 
     fs = SAMPLES_PER_SECOND
 
-    hp_cutoff = 0.5
+    hp_cutoff = HIGHPASS_CUTOFF
+    lp_cutoff = LOWPASS_CUTOFF
     notch_enabled = True
 
     # 根据默认值创建初始滤波器
-    b_hp, a_hp = butter(FILTER_ORDER, hp_cutoff, btype='high', analog=False, fs=fs)
-    zi_states_hp = [lfilter_zi(b_hp, a_hp) for _ in range(NUM_CHANNELS)]
+    b_bp, a_bp = butter(FILTER_ORDER, [hp_cutoff, lp_cutoff], btype='bandpass', analog=False, fs=fs)
+    zi_states_bp = [lfilter_zi(b_bp, a_bp) for _ in range(NUM_CHANNELS)]
 
     b_notch, a_notch = iirnotch(NOTCH_FREQ, NOTCH_QUALITY_FACTOR, fs=fs)
     zi_states_notch = [lfilter_zi(b_notch, a_notch) for _ in range(NUM_CHANNELS)]
@@ -121,10 +123,12 @@ def filter_worker(raw_data_queue, filtered_data_queues, storage_queue, command_q
 
                 # 重新设计滤波器
                 hp_cutoff = new_settings['highpass_cutoff']
+                lp_cutoff = new_settings['lowpass_cutoff']
                 notch_enabled = new_settings['notch_filter_enabled']
 
-                b_hp, a_hp = butter(FILTER_ORDER, hp_cutoff, btype='high', analog=False, fs=fs)
-                zi_states_hp = [lfilter_zi(b_hp, a_hp) for _ in range(NUM_CHANNELS)]  # 重置状态
+                print(f"Redesigning bandpass filter for {hp_cutoff}-{lp_cutoff} Hz")
+                b_bp, a_bp = butter(FILTER_ORDER, [hp_cutoff, lp_cutoff], btype='bandpass', analog=False, fs=fs)
+                zi_states_bp = [lfilter_zi(b_bp, a_bp) for _ in range(NUM_CHANNELS)]  # 重置状态
 
                 if notch_enabled:
                     b_notch, a_notch = iirnotch(NOTCH_FREQ, NOTCH_QUALITY_FACTOR, fs=fs)
@@ -144,17 +148,16 @@ def filter_worker(raw_data_queue, filtered_data_queues, storage_queue, command_q
 
             final_filtered_batch = [[] for _ in range(NUM_CHANNELS)]
             for ch in range(NUM_CHANNELS):
-                hp_filtered_chunk, zi_states_hp[ch] = lfilter(b_hp, a_hp, raw_batch[ch], zi=zi_states_hp[ch])
+                bp_filtered_chunk, zi_states_bp[ch] = lfilter(b_bp, a_bp, raw_batch[ch], zi=zi_states_bp[ch])
 
                 if notch_enabled:
-                    notch_filtered_chunk, zi_states_notch[ch] = lfilter(b_notch, a_notch, hp_filtered_chunk,
-                                                                        zi=zi_states_notch[ch])
+                    final_chunk, zi_states_notch[ch] = lfilter(b_notch, a_notch, bp_filtered_chunk, zi=zi_states_notch[ch])
                 else:
-                    notch_filtered_chunk = hp_filtered_chunk  # 如果禁用陷波器，则直接跳过
+                    final_chunk = bp_filtered_chunk   # 如果禁用陷波器，则直接跳过
 
-                for value in notch_filtered_chunk:
+                for value in final_chunk:
                     filtered_data_queues[ch].append(value)
-                final_filtered_batch[ch].extend(notch_filtered_chunk)
+                final_filtered_batch[ch].extend(final_chunk)
 
             storage_queue.put(final_filtered_batch)
 

@@ -42,6 +42,11 @@ class SettingsDialog(QDialog):
         self.notch_filter_checkbox.setChecked(self.settings.get('notch_filter_enabled', True))
         form_layout.addRow("启用50Hz陷波器:", self.notch_filter_checkbox)
 
+        # 低通滤波截止频率
+        self.lp_cutoff_input = QLineEdit(str(self.settings.get('lowpass_cutoff', 100.0)))
+        self.lp_cutoff_input.setValidator(QDoubleValidator(20.0, 120.0, 1, self))  # 限制在20-120Hz之间
+        form_layout.addRow("低通截止频率 (Hz):", self.lp_cutoff_input)
+
         # --- 绘图设置部分 ---
         plot_label = QLabel("绘图设置")
         font = plot_label.font()
@@ -67,6 +72,7 @@ class SettingsDialog(QDialog):
     def get_settings(self):
         """当用户点击“确定”后，调用此方法来获取新的设置"""
         self.settings['highpass_cutoff'] = float(self.hp_cutoff_input.text())
+        self.settings['lowpass_cutoff'] = float(self.lp_cutoff_input.text())
         self.settings['notch_filter_enabled'] = self.notch_filter_checkbox.isChecked()
         self.settings['plot_duration_s'] = float(self.plot_duration_input.text())
         return self.settings

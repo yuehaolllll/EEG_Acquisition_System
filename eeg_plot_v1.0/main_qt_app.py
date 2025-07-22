@@ -36,6 +36,7 @@ class MainWindow(QMainWindow):
 
         self.app_settings = {
             'highpass_cutoff': backend.HIGHPASS_CUTOFF,
+            'lowpass_cutoff': 100.0,
             'notch_filter_enabled': True,
             'plot_duration_s': PLOT_DURATION_S
         }
@@ -310,6 +311,7 @@ class MainWindow(QMainWindow):
             'type': 'UPDATE_SETTINGS',
             'data': {
                 'highpass_cutoff': self.app_settings['highpass_cutoff'],
+                'lowpass_cutoff': self.app_settings['lowpass_cutoff'],
                 'notch_filter_enabled': self.app_settings['notch_filter_enabled']
             }
         }
