@@ -34,10 +34,10 @@ FILTER_ORDER = 4
 NOTCH_FREQ = 50.0
 NOTCH_QUALITY_FACTOR = 30.0
 
-b_hp, a_hp = butter(FILTER_ORDER, HIGHPASS_CUTOFF, btype='high', analog=False, fs=SAMPLES_PER_SECOND)
-zi_states_hp = [lfilter_zi(b_hp, a_hp) for _ in range(NUM_CHANNELS)]
-b_notch, a_notch = iirnotch(NOTCH_FREQ, NOTCH_QUALITY_FACTOR, fs=SAMPLES_PER_SECOND)
-zi_states_notch = [lfilter_zi(b_notch, a_notch) for _ in range(NUM_CHANNELS)]
+# b_hp, a_hp = butter(FILTER_ORDER, HIGHPASS_CUTOFF, btype='high', analog=False, fs=SAMPLES_PER_SECOND)
+# zi_states_hp = [lfilter_zi(b_hp, a_hp) for _ in range(NUM_CHANNELS)]
+# b_notch, a_notch = iirnotch(NOTCH_FREQ, NOTCH_QUALITY_FACTOR, fs=SAMPLES_PER_SECOND)
+# zi_states_notch = [lfilter_zi(b_notch, a_notch) for _ in range(NUM_CHANNELS)]
 
 
 # --- data process ---
@@ -95,31 +95,72 @@ def socket_data_receiver(raw_data_queue):
         raw_data_queue.put(None) # 发送结束信号
 
 
-def filter_worker(raw_data_queue, filtered_data_queues, storage_queue):
-    global zi_states_hp, zi_states_notch
+def filter_worker(raw_data_queue, filtered_data_queues, storage_queue, command_queue):
+    #global zi_states_hp, zi_states_notch
     print("Starting filter worker thread...")
+
+    fs = SAMPLES_PER_SECOND
+
+    hp_cutoff = 0.5
+    notch_enabled = True
+
+    # 根据默认值创建初始滤波器
+    b_hp, a_hp = butter(FILTER_ORDER, hp_cutoff, btype='high', analog=False, fs=fs)
+    zi_states_hp = [lfilter_zi(b_hp, a_hp) for _ in range(NUM_CHANNELS)]
+
+    b_notch, a_notch = iirnotch(NOTCH_FREQ, NOTCH_QUALITY_FACTOR, fs=fs)
+    zi_states_notch = [lfilter_zi(b_notch, a_notch) for _ in range(NUM_CHANNELS)]
+
     while True:
-        raw_batch = raw_data_queue.get()
-        if raw_batch is None:
-            storage_queue.put(None)  # 传递结束信号
-            # 也通知绘图队列结束
-            for q in filtered_data_queues:
-                q.append(None)  # 发送哨兵值
-            break
 
-        final_filtered_batch = [[] for _ in range(NUM_CHANNELS)]
-        for ch in range(NUM_CHANNELS):
-            hp_filtered_chunk, zi_states_hp[ch] = lfilter(b_hp, a_hp, raw_batch[ch], zi=zi_states_hp[ch])
-            notch_filtered_chunk, zi_states_notch[ch] = lfilter(b_notch, a_notch, hp_filtered_chunk,
-                                                                zi=zi_states_notch[ch])
+        try:
+            command = command_queue.get_nowait()
+            if command['type'] == 'UPDATE_SETTINGS':
+                new_settings = command['data']
+                print("Filter worker received new settings:", new_settings)
 
-            # 更新用于绘图的deque
-            for value in notch_filtered_chunk:
-                filtered_data_queues[ch].append(value)
+                # 重新设计滤波器
+                hp_cutoff = new_settings['highpass_cutoff']
+                notch_enabled = new_settings['notch_filter_enabled']
 
-            final_filtered_batch[ch].extend(notch_filtered_chunk)
+                b_hp, a_hp = butter(FILTER_ORDER, hp_cutoff, btype='high', analog=False, fs=fs)
+                zi_states_hp = [lfilter_zi(b_hp, a_hp) for _ in range(NUM_CHANNELS)]  # 重置状态
 
-        storage_queue.put(final_filtered_batch)
+                if notch_enabled:
+                    b_notch, a_notch = iirnotch(NOTCH_FREQ, NOTCH_QUALITY_FACTOR, fs=fs)
+                    zi_states_notch = [lfilter_zi(b_notch, a_notch) for _ in range(NUM_CHANNELS)]
+
+        except queue.Empty:
+            pass  # 队列为空是正常的
+
+        try:
+            raw_batch = raw_data_queue.get(timeout=0.1)
+            if raw_batch is None:
+                storage_queue.put(None)  # 传递结束信号
+                # 也通知绘图队列结束
+                for q in filtered_data_queues:
+                    q.append(None)  # 发送哨兵值
+                break
+
+            final_filtered_batch = [[] for _ in range(NUM_CHANNELS)]
+            for ch in range(NUM_CHANNELS):
+                hp_filtered_chunk, zi_states_hp[ch] = lfilter(b_hp, a_hp, raw_batch[ch], zi=zi_states_hp[ch])
+
+                if notch_enabled:
+                    notch_filtered_chunk, zi_states_notch[ch] = lfilter(b_notch, a_notch, hp_filtered_chunk,
+                                                                        zi=zi_states_notch[ch])
+                else:
+                    notch_filtered_chunk = hp_filtered_chunk  # 如果禁用陷波器，则直接跳过
+
+                for value in notch_filtered_chunk:
+                    filtered_data_queues[ch].append(value)
+                final_filtered_batch[ch].extend(notch_filtered_chunk)
+
+            storage_queue.put(final_filtered_batch)
+
+        except queue.Empty:
+            continue  # 数据队列为空也是正常的
+
     print("Filter worker thread finished.")
 
 
@@ -127,13 +168,29 @@ def data_storage_worker(storage_queue, recording_event):
     print("Starting data storage thread...")
     data_to_save = [[] for _ in range(NUM_CHANNELS)]
 
+    events_to_save = []
+
     timestamp = None
     filename = None
     is_file_open = False
 
+    recording_start_time = None
     while True:
         try:
             batch = storage_queue.get(timeout=0.1)
+
+            if isinstance(batch, tuple) and batch[0] == 'MARKER':
+                # 标记格式: ('MARKER', absolute_timestamp)
+                if recording_event.is_set():  # 只在记录期间才保存标记
+                    event_time = batch[1]
+                    event_label = batch[2]
+                    # 计算相对于记录开始的秒数
+                    relative_time = event_time - recording_start_time
+                    events_to_save.append([relative_time, event_label])
+                    print(f"Marker logged at {relative_time:.3f} seconds from recording start.")
+                else:
+                    print("Marker ignored (not recording).")
+                continue
 
             if recording_event.is_set():
                 if not is_file_open:
@@ -141,6 +198,7 @@ def data_storage_worker(storage_queue, recording_event):
                     filename = f"data/EEG_data_{timestamp}.mat"
                     print(f"Recording started. Saving to {filename}")
                     is_file_open = True
+                    recording_start_time = time.time()
 
                 for ch in range(NUM_CHANNELS):
                     data_to_save[ch].extend(batch[ch])
@@ -150,13 +208,16 @@ def data_storage_worker(storage_queue, recording_event):
                     print(f"Stopping recording. Finalizing save to {filename}...")
                     mat_data = {f'CH{i + 1}': np.array(data_to_save[i]) for i in range(NUM_CHANNELS)}
                     mat_data['fs'] = SAMPLES_PER_SECOND
+                    mat_data['events'] = np.array(events_to_save, dtype=object)
                     sio.savemat(filename, mat_data)
                     print("File saved.")
                 else:
                     print("Stop command received, but no data to save.")
 
                 data_to_save = [[] for _ in range(NUM_CHANNELS)]
+                events_to_save = []
                 is_file_open = False
+                recording_start_time = None
 
                 if batch is None:  # 如果是程序退出信号
                     break
@@ -170,10 +231,10 @@ def data_storage_worker(storage_queue, recording_event):
     print("Data storage thread finished.")
 
 
-def start_backend_threads(raw_q, filtered_qs, storage_q, recording_event):
+def start_backend_threads(raw_q, filtered_qs, storage_q, recording_event, command_queue):
     """启动所有后台线程"""
     receiver_thread = threading.Thread(target=socket_data_receiver, args=(raw_q,), daemon=True)
-    filter_thread = threading.Thread(target=filter_worker, args=(raw_q, filtered_qs, storage_q), daemon=True)
+    filter_thread = threading.Thread(target=filter_worker, args=(raw_q, filtered_qs, storage_q, command_queue), daemon=True)
     storage_thread = threading.Thread(target=data_storage_worker, args=(storage_q, recording_event), daemon=True)
 
     receiver_thread.start()

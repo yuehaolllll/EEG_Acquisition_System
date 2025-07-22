@@ -164,8 +164,8 @@ void MX_FREERTOS_Init(void) {
   processTaskHandle = osThreadCreate(osThread(processTask), NULL);
 
   /* definition and creation of led */
-//  osThreadDef(led, ledTask, osPriorityIdle, 0, 128);
-//  ledHandle = osThreadCreate(osThread(led), NULL);
+  osThreadDef(led, ledTask, osPriorityIdle, 0, 128);
+  ledHandle = osThreadCreate(osThread(led), NULL);
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* USER CODE END RTOS_THREADS */
@@ -397,17 +397,17 @@ void processDataTask(void const * argument){
 * @retval None
 */
 /* USER CODE END Header_ledTask */
-//void ledTask(void const * argument)
-//{
-//  /* USER CODE BEGIN ledTask */
-//  /* Infinite loop */
-//  for(;;)
-//  {
-//		HAL_GPIO_TogglePin(LED1_GPIO_Port,LED1_Pin);
-//    osDelay(500);
-//  }
-//  /* USER CODE END ledTask */
-//}
+void ledTask(void const * argument)
+{
+  /* USER CODE BEGIN ledTask */
+  /* Infinite loop */
+  for(;;)
+  {
+		HAL_GPIO_TogglePin(LED1_GPIO_Port,LED1_Pin);
+    osDelay(500);
+  }
+  /* USER CODE END ledTask */
+}
 
 /* Private application code --------------------------------------------------*/
 /* USER CODE BEGIN Application */

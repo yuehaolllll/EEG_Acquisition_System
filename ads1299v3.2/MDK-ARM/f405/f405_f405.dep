@@ -1,7 +1,7 @@
 Dependencies for Project 'f405', Target 'f405': (DO NOT MODIFY !)
 CompilerVersion: 5060960::V5.06 update 7 (build 960)::.\ARMCC
 F (startup_stm32f405xx.s)(0x686F2272)(--cpu Cortex-M4.fp.sp -g --apcs=interwork --pd "__MICROLIB SETA 1" -I ../Core/Inc -I ../Drivers/CMSIS/Include-I.\RTE\_f405-IF:\Keil\ARM\CMSIS\5.7.0\CMSIS\Core\Include--pd "__UVISION_VERSION SETA 534" --pd "_RTE_ SETA 1" --pd "STM32F405xx SETA 1" --pd "_RTE_ SETA 1"--list startup_stm32f405xx.lst --xref -o f405\startup_stm32f405xx.o --depend f405\startup_stm32f405xx.d)
-F (..\Core\Src\ads1299\ads1299.c)(0x6878CD19)(--c99 -c --cpu Cortex-M4.fp.sp -D__MICROLIB -g -O2 --apcs=interwork --split_sections -I ../Core/Inc -I ../Drivers/STM32F4xx_HAL_Driver/Inc -I ../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I ../Middlewares/Third_Party/FreeRTOS/Source/include -I ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS -I ../Middlewares/Third_Party/FreeRTOS/Source/portable/RVDS/ARM_CM4F -I ../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I ../Drivers/CMSIS/Include -I ../Core/Src/ads1299 -I ../Core/Src/wifi-I.\RTE\_f405-IF:\Keil\ARM\CMSIS\5.7.0\CMSIS\Core\Include-D__UVISION_VERSION="534" -D_RTE_ -DSTM32F405xx -D_RTE_ -DUSE_HAL_DRIVER -DSTM32F405xx-o f405\ads1299.o --omf_browse f405\ads1299.crf --depend f405\ads1299.d)
+F (..\Core\Src\ads1299\ads1299.c)(0x687CAD19)(--c99 -c --cpu Cortex-M4.fp.sp -D__MICROLIB -g -O2 --apcs=interwork --split_sections -I ../Core/Inc -I ../Drivers/STM32F4xx_HAL_Driver/Inc -I ../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I ../Middlewares/Third_Party/FreeRTOS/Source/include -I ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS -I ../Middlewares/Third_Party/FreeRTOS/Source/portable/RVDS/ARM_CM4F -I ../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I ../Drivers/CMSIS/Include -I ../Core/Src/ads1299 -I ../Core/Src/wifi-I.\RTE\_f405-IF:\Keil\ARM\CMSIS\5.7.0\CMSIS\Core\Include-D__UVISION_VERSION="534" -D_RTE_ -DSTM32F405xx -D_RTE_ -DUSE_HAL_DRIVER -DSTM32F405xx-o f405\ads1299.o --omf_browse f405\ads1299.crf --depend f405\ads1299.d)
 I (..\Core\Src\ads1299\ads1299.h)(0x687233BB)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h)(0x68689B5D)
 I (../Core/Inc/stm32f4xx_hal_conf.h)(0x6854D2FA)
@@ -57,7 +57,7 @@ I (F:\Keil\ARM\ARMCC\include\stdio.h)(0x5E8E3CC2)
 I (F:\Keil\ARM\ARMCC\include\string.h)(0x5E8E3CC2)
 I (../Core/Inc/main.h)(0x6867D4A7)
 F (..\Core\Src\wifi\wifi.c)(0x686F81AB)(--c99 -c --cpu Cortex-M4.fp.sp -D__MICROLIB -g -O2 --apcs=interwork --split_sections -I ../Core/Inc -I ../Drivers/STM32F4xx_HAL_Driver/Inc -I ../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I ../Middlewares/Third_Party/FreeRTOS/Source/include -I ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS -I ../Middlewares/Third_Party/FreeRTOS/Source/portable/RVDS/ARM_CM4F -I ../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I ../Drivers/CMSIS/Include -I ../Core/Src/ads1299 -I ../Core/Src/wifi-I.\RTE\_f405-IF:\Keil\ARM\CMSIS\5.7.0\CMSIS\Core\Include-D__UVISION_VERSION="534" -D_RTE_ -DSTM32F405xx -D_RTE_ -DUSE_HAL_DRIVER -DSTM32F405xx-o f405\wifi.o --omf_browse f405\wifi.crf --depend f405\wifi.d)
-I (..\Core\Src\wifi\wifi.h)(0x68720DC0)
+I (..\Core\Src\wifi\wifi.h)(0x687DCF06)
 I (../Core/Inc/main.h)(0x6867D4A7)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h)(0x68689B5D)
 I (../Core/Inc/stm32f4xx_hal_conf.h)(0x6854D2FA)
@@ -209,7 +209,7 @@ I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_spi.h)(0x68689B5D)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim.h)(0x68689B5D)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim_ex.h)(0x68689B5D)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h)(0x68689B5D)
-F (../Core/Src/freertos.c)(0x6870BF97)(--c99 -c --cpu Cortex-M4.fp.sp -D__MICROLIB -g -O2 --apcs=interwork --split_sections -I ../Core/Inc -I ../Drivers/STM32F4xx_HAL_Driver/Inc -I ../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I ../Middlewares/Third_Party/FreeRTOS/Source/include -I ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS -I ../Middlewares/Third_Party/FreeRTOS/Source/portable/RVDS/ARM_CM4F -I ../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I ../Drivers/CMSIS/Include -I ../Core/Src/ads1299 -I ../Core/Src/wifi-I.\RTE\_f405-IF:\Keil\ARM\CMSIS\5.7.0\CMSIS\Core\Include-D__UVISION_VERSION="534" -D_RTE_ -DSTM32F405xx -D_RTE_ -DUSE_HAL_DRIVER -DSTM32F405xx-o f405\freertos.o --omf_browse f405\freertos.crf --depend f405\freertos.d)
+F (../Core/Src/freertos.c)(0x687CACC4)(--c99 -c --cpu Cortex-M4.fp.sp -D__MICROLIB -g -O2 --apcs=interwork --split_sections -I ../Core/Inc -I ../Drivers/STM32F4xx_HAL_Driver/Inc -I ../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I ../Middlewares/Third_Party/FreeRTOS/Source/include -I ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS -I ../Middlewares/Third_Party/FreeRTOS/Source/portable/RVDS/ARM_CM4F -I ../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I ../Drivers/CMSIS/Include -I ../Core/Src/ads1299 -I ../Core/Src/wifi-I.\RTE\_f405-IF:\Keil\ARM\CMSIS\5.7.0\CMSIS\Core\Include-D__UVISION_VERSION="534" -D_RTE_ -DSTM32F405xx -D_RTE_ -DUSE_HAL_DRIVER -DSTM32F405xx-o f405\freertos.o --omf_browse f405\freertos.crf --depend f405\freertos.d)
 I (../Middlewares/Third_Party/FreeRTOS/Source/include/FreeRTOS.h)(0x68689AFC)
 I (F:\Keil\ARM\ARMCC\include\stddef.h)(0x5E8E3CC2)
 I (F:\Keil\ARM\ARMCC\include\stdint.h)(0x5E8E3CC2)
@@ -265,7 +265,7 @@ I (F:\Keil\ARM\ARMCC\include\stdio.h)(0x5E8E3CC2)
 I (../Core/Src/ads1299/ads1299.h)(0x687233BB)
 I (F:\Keil\ARM\ARMCC\include\string.h)(0x5E8E3CC2)
 I (F:\Keil\ARM\ARMCC\include\stdbool.h)(0x5E8E3CC2)
-I (../Core/Src/wifi/wifi.h)(0x68720DC0)
+I (../Core/Src/wifi/wifi.h)(0x687DCF06)
 F (../Core/Src/adc.c)(0x6854D2F8)(--c99 -c --cpu Cortex-M4.fp.sp -D__MICROLIB -g -O2 --apcs=interwork --split_sections -I ../Core/Inc -I ../Drivers/STM32F4xx_HAL_Driver/Inc -I ../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I ../Middlewares/Third_Party/FreeRTOS/Source/include -I ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS -I ../Middlewares/Third_Party/FreeRTOS/Source/portable/RVDS/ARM_CM4F -I ../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I ../Drivers/CMSIS/Include -I ../Core/Src/ads1299 -I ../Core/Src/wifi-I.\RTE\_f405-IF:\Keil\ARM\CMSIS\5.7.0\CMSIS\Core\Include-D__UVISION_VERSION="534" -D_RTE_ -DSTM32F405xx -D_RTE_ -DUSE_HAL_DRIVER -DSTM32F405xx-o f405\adc.o --omf_browse f405\adc.crf --depend f405\adc.d)
 I (../Core/Inc/adc.h)(0x6854D2F8)
 I (../Core/Inc/main.h)(0x6867D4A7)
@@ -422,7 +422,7 @@ I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_spi.h)(0x68689B5D)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim.h)(0x68689B5D)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim_ex.h)(0x68689B5D)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h)(0x68689B5D)
-I (../Core/Src/wifi/wifi.h)(0x68720DC0)
+I (../Core/Src/wifi/wifi.h)(0x687DCF06)
 I (F:\Keil\ARM\ARMCC\include\stdbool.h)(0x5E8E3CC2)
 I (F:\Keil\ARM\ARMCC\include\stdio.h)(0x5E8E3CC2)
 F (../Core/Src/stm32f4xx_it.c)(0x686F2330)(--c99 -c --cpu Cortex-M4.fp.sp -D__MICROLIB -g -O2 --apcs=interwork --split_sections -I ../Core/Inc -I ../Drivers/STM32F4xx_HAL_Driver/Inc -I ../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I ../Middlewares/Third_Party/FreeRTOS/Source/include -I ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS -I ../Middlewares/Third_Party/FreeRTOS/Source/portable/RVDS/ARM_CM4F -I ../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I ../Drivers/CMSIS/Include -I ../Core/Src/ads1299 -I ../Core/Src/wifi-I.\RTE\_f405-IF:\Keil\ARM\CMSIS\5.7.0\CMSIS\Core\Include-D__UVISION_VERSION="534" -D_RTE_ -DSTM32F405xx -D_RTE_ -DUSE_HAL_DRIVER -DSTM32F405xx-o f405\stm32f4xx_it.o --omf_browse f405\stm32f4xx_it.crf --depend f405\stm32f4xx_it.d)
@@ -464,7 +464,7 @@ I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim.h)(0x68689B5D)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim_ex.h)(0x68689B5D)
 I (../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h)(0x68689B5D)
 I (../Core/Inc/stm32f4xx_it.h)(0x686F2270)
-I (../Core/Src/wifi/wifi.h)(0x68720DC0)
+I (../Core/Src/wifi/wifi.h)(0x687DCF06)
 I (F:\Keil\ARM\ARMCC\include\stdbool.h)(0x5E8E3CC2)
 F (../Core/Src/stm32f4xx_hal_msp.c)(0x6867D442)(--c99 -c --cpu Cortex-M4.fp.sp -D__MICROLIB -g -O2 --apcs=interwork --split_sections -I ../Core/Inc -I ../Drivers/STM32F4xx_HAL_Driver/Inc -I ../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I ../Middlewares/Third_Party/FreeRTOS/Source/include -I ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS -I ../Middlewares/Third_Party/FreeRTOS/Source/portable/RVDS/ARM_CM4F -I ../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I ../Drivers/CMSIS/Include -I ../Core/Src/ads1299 -I ../Core/Src/wifi-I.\RTE\_f405-IF:\Keil\ARM\CMSIS\5.7.0\CMSIS\Core\Include-D__UVISION_VERSION="534" -D_RTE_ -DSTM32F405xx -D_RTE_ -DUSE_HAL_DRIVER -DSTM32F405xx-o f405\stm32f4xx_hal_msp.o --omf_browse f405\stm32f4xx_hal_msp.crf --depend f405\stm32f4xx_hal_msp.d)
 I (../Core/Inc/main.h)(0x6867D4A7)

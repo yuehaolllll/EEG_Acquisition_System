@@ -5,9 +5,9 @@
 #include "stdbool.h"
 
 //----------------- ”√ªß≈‰÷√«¯ -----------------
-#define WIFI_SSID           "Yue"
+#define WIFI_SSID           "EEG"
 #define WIFI_PASSWORD       "12345678"
-#define SERVER_IP           "192.168.242.47"
+#define SERVER_IP           "192.168.137.144"
 #define SERVER_PORT         8080            
 
 #define WIFI_UART_HANDLE    huart3
