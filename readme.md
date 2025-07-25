@@ -40,5 +40,5 @@
 ![alt text](images/EOG.png)  
 *如图所示的通道一为采集到的眼动伪影波形图。图中可以看出眼动信号可以被准确采集*  
 ### EEG Test
-![alt text](images/Alpha wave.png)
+![alt text](images/Alpha_wave.png)
 *如图所示的通道一为采集到的脑电信号波形图。此图中可以清晰看到10Hz频率附近幅度明显，这就是Alpha波。*  
