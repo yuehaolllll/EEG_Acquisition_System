@@ -10,7 +10,7 @@ from queue import Queue
 import pyqtgraph as pg
 from PyQt6.QtWidgets import (QApplication, QMainWindow, QWidget, QGridLayout,
                              QVBoxLayout, QCheckBox, QHBoxLayout, QFrame, QLabel,
-                             QPushButton, QSizePolicy, QLineEdit, QProgressBar)
+                             QPushButton, QSizePolicy, QLineEdit, QProgressBar, QGroupBox)
 from PyQt6.QtCore import QTimer, Qt, QEvent
 from PyQt6.QtGui import QIcon
 import threading
@@ -99,57 +99,64 @@ class MainWindow(QMainWindow):
 
         top_channels_layout.addStretch(1)  # 把复选框推到左边
 
-        # 3. 创建下方的主内容区 (它内部是一个水平布局)
+        # 3. 创建下方的主内容区
         bottom_area_widget = QWidget()
         bottom_layout = QHBoxLayout(bottom_area_widget)
         bottom_layout.setContentsMargins(0, 0, 0, 0)  # 内部无边距
 
-        # --- 3.1 创建左侧的控制面板 (除了通道选择之外的所有东西) ---
+        # --- 3.1 创建左侧的控制面板 ---
         left_control_panel = QWidget()
         left_control_panel.setObjectName("ControlPanel")
-        left_control_panel.setFixedWidth(180)  # 可以稍微宽一点
+        left_control_panel.setFixedWidth(220)  # 可以稍微宽一点
         left_layout = QVBoxLayout(left_control_panel)
         left_layout.setContentsMargins(10, 10, 10, 10)
-        left_layout.setSpacing(5)
+        left_layout.setSpacing(15)
         left_layout.setAlignment(Qt.AlignmentFlag.AlignTop)
 
         # 添加记录控制部分
-        left_layout.addWidget(QLabel("<b>状态:</b>"))
+        record_group = QGroupBox("记录控制")
+        record_group_layout = QGridLayout(record_group)  # 使用网格布局，更灵活
+
         self.status_label = QLabel("未开始")
-        left_layout.addWidget(self.status_label)
+        self.status_label.setObjectName("StatusLabel_Idle")  # 用于QSS选择
 
         self.record_button = QPushButton("开始记录")
-        self.record_button.setStyleSheet("background-color: #2ecc71; color: white; font-weight: bold;")
+        self.record_button.setObjectName("RecordButton_Start")  # QSS
+        self.record_button.setMinimumHeight(30)  # 让按钮更高一点
         self.record_button.clicked.connect(self.toggle_recording)
-        left_layout.addWidget(self.record_button)
 
         self.stop_button = QPushButton("停止记录")
-        self.stop_button.setStyleSheet("background-color: #e74c3c; color: white; font-weight: bold;")
+        self.stop_button.setObjectName("RecordButton_Stop")  # QSS
+        self.stop_button.setMinimumHeight(30)
         self.stop_button.setEnabled(False)
         self.stop_button.clicked.connect(self.stop_recording)
-        left_layout.addWidget(self.stop_button)
+
+        record_group_layout.addWidget(QLabel("状态:"), 0, 0)
+        record_group_layout.addWidget(self.status_label, 0, 1)
+        record_group_layout.addWidget(self.record_button, 1, 0)
+        record_group_layout.addWidget(self.stop_button, 1, 1)
 
         # 添加事件标记部分
-        left_layout.addWidget(QLabel("<b>事件标记:</b>"))
+        marker_group = QGroupBox("事件标记")
+        marker_group_layout = QVBoxLayout(marker_group)
+
         self.event_label_input = QLineEdit("DefaultEvent")
         self.event_label_input.setPlaceholderText("输入事件标签...")
-        left_layout.addWidget(self.event_label_input)
+
         self.mark_event_button = QPushButton("标记事件 (Space)")
-        self.mark_event_button.setStyleSheet("background-color: #3498db; color: white;")
+        self.mark_event_button.setObjectName("MarkEventButton")  # QSS
+        self.mark_event_button.setMinimumHeight(30)
         self.mark_event_button.setEnabled(False)
         self.mark_event_button.clicked.connect(self.mark_event)
-        left_layout.addWidget(self.mark_event_button)
+
+        marker_group_layout.addWidget(self.event_label_input)
+        marker_group_layout.addWidget(self.mark_event_button)
 
         left_layout.addStretch(1)  # 弹性空间
 
         # 添加脑电节律分析部分
-        rhythm_title = QLabel("<b>Brainwave Rhythms (Avg)</b>")
-        rhythm_title.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        left_layout.addWidget(rhythm_title)
-        separator = QFrame()
-        separator.setFrameShape(QFrame.Shape.HLine)
-        separator.setFrameShadow(QFrame.Shadow.Sunken)
-        left_layout.addWidget(separator)
+        rhythm_group = QGroupBox("脑电节律分析 (Avg)")
+        rhythm_bars_layout = QGridLayout()
 
         self.rhythm_bands = {
             'Delta (1-4 Hz)': (1, 4, '#7f8c8d'),
@@ -159,23 +166,37 @@ class MainWindow(QMainWindow):
             'Gamma (30-100 Hz)': (30, 100, '#f1c40f')
         }
         self.rhythm_progress_bars = {}
-        rhythm_bars_layout = QGridLayout()
         row = 0
         for name, (f_low, f_high, color) in self.rhythm_bands.items():
-            bar_label = QLabel(name)
+            bar_label = QLabel(name.split(' ')[0])
             progress_bar = QProgressBar()
             progress_bar.setRange(0, 100)
             progress_bar.setTextVisible(True)
-            progress_bar.setFormat(f"%p%")
+            progress_bar.setFormat(f"")
             progress_bar.setStyleSheet(f"""
-                QProgressBar {{ border: 1px solid grey; border-radius: 5px; text-align: center; }}
-                QProgressBar::chunk {{ background-color: {color}; width: 10px; }}
-            """)
+                    QProgressBar {{ 
+                        border: none; 
+                        border-radius: 4px; 
+                        background-color: #D0D0D0; 
+                        height: 12px; /* 给一个固定的高度 */
+                    }}
+                    QProgressBar::chunk {{ 
+                        background-color: {color}; 
+                        border-radius: 4px;
+                    }}
+                """)
             rhythm_bars_layout.addWidget(bar_label, row, 0)
             rhythm_bars_layout.addWidget(progress_bar, row, 1)
+            rhythm_bars_layout.setColumnStretch(1, 1)
             self.rhythm_progress_bars[name] = progress_bar
             row += 1
-        left_layout.addLayout(rhythm_bars_layout)
+        #left_layout.addLayout(rhythm_bars_layout)
+        rhythm_group.setLayout(rhythm_bars_layout)
+
+        left_layout.addWidget(record_group)
+        left_layout.addWidget(marker_group)
+        left_layout.addWidget(rhythm_group)
+        left_layout.addStretch(1)
 
         # --- 3.2 创建右侧的绘图区域 ---
         plot_area_widget = QWidget()
@@ -357,7 +378,7 @@ class MainWindow(QMainWindow):
         lines_for_this_event = []
 
         for i in range(NUM_CHANNELS):
-            if self.channel_checkboxes[i].isChecked():
+            if self.channel_buttons[i].isChecked():
                 # 为这个通道创建一个全新的 InfiniteLine 实例
                 marker_line = pg.InfiniteLine(pos=0, angle=90, movable=True,
                                               pen=pg.mkPen('r', width=2, style=Qt.PenStyle.DashLine))
@@ -393,6 +414,7 @@ class MainWindow(QMainWindow):
             self.stop_button.setEnabled(True)
             self.mark_event_button.setEnabled(True)
             self.status_label.setText("状态: 正在记录...")
+            self.status_label.setObjectName("StatusLabel_Recording")
             self.status_label.setStyleSheet("color: green;")
         else:
             # 这是“暂停记录”的逻辑
@@ -401,7 +423,11 @@ class MainWindow(QMainWindow):
             self.record_button.setStyleSheet("background-color: #2ecc71; color: white; font-weight: bold;")
             self.mark_event_button.setEnabled(False)
             self.status_label.setText("状态: 记录暂停")
-            self.status_label.setStyleSheet("color: orange;")
+            self.status_label.setObjectName("StatusLabel_Paused")
+            #self.status_label.setStyleSheet("color: orange;")
+
+        self.status_label.style().unpolish(self.status_label)
+        self.status_label.style().polish(self.status_label)
 
     def stop_recording(self):
         # 停止逻辑
@@ -414,7 +440,11 @@ class MainWindow(QMainWindow):
         self.stop_button.setEnabled(False)
         self.mark_event_button.setEnabled(False)
         self.status_label.setText("状态: 记录已停止")
-        self.status_label.setStyleSheet("color: red;")
+        self.status_label.setObjectName("StatusLabel_Stopped")
+        #self.status_label.setStyleSheet("color: red;")
+
+        self.status_label.style().unpolish(self.status_label)
+        self.status_label.style().polish(self.status_label)
 
     def update_channel_visibility(self, channel_index, is_visible):
         """当复选框状态改变时，此函数被调用"""
@@ -520,109 +550,138 @@ if __name__ == '__main__':
     light_theme_stylesheet = """
             /* --- 全局样式 --- */
             QWidget {
-                background-color: #F0F0F0; 
-                color: #000000;
+                background-color: #F0F0F0;
+                color: #333333;
                 font-family: "Segoe UI", Arial, sans-serif;
             }
-
-            /* --- 控制面板样式 --- */
+            QLineEdit, QCheckBox, QPushButton, QProgressBar {
+                font-size: 12px; /* 统一基础字体大小 */
+            }
+        
+            /* --- 主窗口面板样式 --- */
             #ControlPanel {
                 background-color: #EAEAEA;
-                border-radius: 5px;
             }
-
-            #TitleLabel {
-                font-weight: bold;
-                font-size: 14pt;
-                color: #2c3e50;
-                background-color: transparent;
-            }
-
-            QLabel {
-                 background-color: transparent;
-            }
-
-            /* --- 分隔线样式 --- */
-            QFrame[frameShape="4"] {
+            
+            /* ============================================================= */
+            /* --- 通用组框 (QGroupBox) 样式 --- */
+            /* ============================================================= */
+            QGroupBox {
+                background-color: #FDFDFD;
                 border: 1px solid #D0D0D0;
+                border-radius: 8px;
+                margin-top: 10px;
+                padding: 10px;
             }
-
-            /* --- 复选框(QCheckBox)的详细样式 (保留，以备将来使用) --- */
-            QCheckBox {
-                spacing: 5px;
-                background-color: transparent;
+            QGroupBox::title {
+                subcontrol-origin: margin;
+                subcontrol-position: top left;
+                padding-left: 10px;
+                padding-right: 10px;
+                font-weight: bold;
+                color: #2c3e50;
             }
+        
+            /* ============================================================= */
+            /* --- 设置对话框的特定样式 --- */
+            /* ============================================================= */
+            #SettingsDialog {
+                 background-color: #F0F0F0; /* 对话框背景色 */
+            }
+            #SettingsDialog QGroupBox {
+                padding: 15px; /* 对话框内的组框内边距更大一些 */
+            }
+            #SettingsDialog QLineEdit {
+                 padding: 5px;
+                 min-height: 22px;
+            }
+            #SettingsDialog QPushButton {
+                padding: 8px 20px; /* OK/Cancel 按钮更大 */
+            }
+            
+            /* ============================================================= */
+            /* --- 复选框的终极解决方案 --- */
+            /* ============================================================= */
             QCheckBox::indicator {
                 width: 18px;
                 height: 18px;
                 border-radius: 4px;
             }
+            /* 未选中状态：白色背景，清晰的深灰色边框 */
             QCheckBox::indicator:unchecked {
                 background-color: #FFFFFF;
-                border: 2px solid #A9A9A9;
+                border: 2px solid #707070; 
             }
+            /* 鼠标悬停在未选中框上：边框变蓝 */
             QCheckBox::indicator:unchecked:hover {
                 border: 2px solid #3498db;
             }
+            /* 选中状态：蓝色背景，白色对号 */
             QCheckBox::indicator:checked {
                 background-color: #3498db;
-                border: 2px solid #3498db;
-                image: url(C:/Windows/System32/shell32.dll:105);
+                border: 2px solid #2980b9;
+                /* 使用SVG代码直接绘制一个对号，无需外部文件，跨平台兼容！*/
+                image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'><path fill='white' d='M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z'/></svg>");
             }
-
+        
             /* ============================================================= */
-            /* --- 新增：通道选择按钮的精确样式 --- */
+            /* --- 按钮的精细化样式 --- */
             /* ============================================================= */
-
-            /* 使用属性选择器来选中所有对象名以'channelButton_'开头的按钮 */
+            QPushButton {
+                border-radius: 4px;
+                padding: 5px 10px;
+                border: 1px solid #B0B0B0;
+                background-color: #E0E0E0;
+            }
+            QPushButton:hover {
+                border-color: #3498db;
+            }
+            QPushButton:pressed {
+                background-color: #C0C0C0;
+            }
+        
+            /* -- 记录按钮的特定颜色 -- */
+            #RecordButton_Start { background-color: #2ecc71; color: white; font-weight: bold; }
+            #RecordButton_Stop { background-color: #e74c3c; color: white; font-weight: bold; }
+            #MarkEventButton { background-color: #3498db; color: white; }
+            
+            /* 让禁用的按钮看起来更明显 */
+            QPushButton:disabled {
+                background-color: #D0D0D0;
+                color: #A0A0A0;
+            }
+        
+            /* --- 状态标签的样式 --- */
+            #StatusLabel_Idle { color: #808080; }
+            #StatusLabel_Recording { color: #27ae60; font-weight: bold; }
+            #StatusLabel_Paused { color: #d35400; font-weight: bold; }
+            #StatusLabel_Stopped { color: #c0392b; }
+        
+            /* --- 输入框样式 --- */
+            QLineEdit {
+                background-color: white;
+                border: 1px solid #C0C0C0;
+                border-radius: 4px;
+                padding: 4px;
+            }
+            
+            /* --- 通道按钮样式 --- */
             QPushButton[objectName^="channelButton_"] {
-                background-color: #E0E0E0; /* 默认/未选中时的背景色 */
+                background-color: #E0E0E0;
                 border: 1px solid #B0B0B0;
                 border-radius: 4px;
                 font-weight: bold;
-                padding: 2px; /* 增加一点内边距 */
+                padding: 2px;
             }
-
             QPushButton[objectName^="channelButton_"]:hover {
-                background-color: #F0F0F0; /* 鼠标悬停 */
-                border-color: #3498db; /* 边框变蓝 */
+                background-color: #F0F0F0;
+                border-color: #3498db;
             }
-
             QPushButton[objectName^="channelButton_"]:checked {
-                background-color: #3498db; /* 选中时的背景色 (蓝色) */
-                color: white;              /* 选中时文字变白色 */
-                border: 1px solid #2980b9; /* 边框变深蓝 */
+                background-color: #3498db;
+                color: white;
+                border: 1px solid #2980b9;
             }
-
-            /* 
-             * --- 显示“对号”的方案选择 ---
-             * 你可以取消下面一个方案的注释来启用它。
-             * 推荐方案A，因为它最简单可靠。
-            */
-
-            /* 方案A: 在选中按钮的文字前添加一个✔字符 (无需图片) */
-            QPushButton[objectName^="channelButton_"]:checked:!text-isEmpty {
-                padding-left: 5px; /* 为图标留出空间 */
-            }
-            QPushButton[objectName^="channelButton_"]:checked::before {
-                 content: "✔";
-                 padding-right: 3px;
-            }
-
-
-            /*
-            // 方案B: 使用外部图标文件 (更专业)
-            // 1. 找到一个名为 'check.png' 的白色对号图标文件
-            // 2. 把它放到和你的.py脚本相同的目录下
-            // 3. 取消下面这几行代码的注释
-
-            QPushButton[objectName^="channelButton_"]:checked {
-                qproperty-icon: url(check.png); 
-                qproperty-iconSize: 12px;
-                padding-left: 5px;
-            }
-            */
-
         """
     app.setStyleSheet(light_theme_stylesheet)
 
