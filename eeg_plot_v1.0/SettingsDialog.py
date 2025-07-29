@@ -36,7 +36,7 @@ class SettingsDialog(QDialog):
 
         # 高通滤波器截止频率
         self.hp_cutoff_input = QLineEdit(str(self.settings.get('highpass_cutoff', 0.5)))
-        self.hp_cutoff_input.setValidator(QDoubleValidator(0.1, 10.0, 2, self))
+        self.hp_cutoff_input.setValidator(QDoubleValidator(0, 10.0, 2, self))
         form_layout_filter.addRow("高通截止频率 (Hz):", self.hp_cutoff_input)
 
         # 50Hz陷波器开关

@@ -29,7 +29,7 @@ SAVE_DURATION_S = 60
 SAMPLES_PER_FILE = SAMPLES_PER_SECOND * SAVE_DURATION_S
 
 # --- filter config ---
-HIGHPASS_CUTOFF = 0.5
+HIGHPASS_CUTOFF = 0.1
 LOWPASS_CUTOFF = 100.0
 FILTER_ORDER = 4
 NOTCH_FREQ = 50.0
@@ -107,8 +107,14 @@ def filter_worker(raw_data_queue, filtered_data_queues, storage_queue, command_q
     notch_enabled = True
 
     # 根据默认值创建初始滤波器
-    b_bp, a_bp = butter(FILTER_ORDER, [hp_cutoff, lp_cutoff], btype='bandpass', analog=False, fs=fs)
-    zi_states_bp = [lfilter_zi(b_bp, a_bp) for _ in range(NUM_CHANNELS)]
+    if hp_cutoff > 0:
+        print(f"Initializing with BANDPASS filter: {hp_cutoff} - {lp_cutoff} Hz")
+        b_filter, a_filter = butter(FILTER_ORDER, [hp_cutoff, lp_cutoff], btype='bandpass', analog=False, fs=fs)
+    else:
+        print(f"Initializing with LOWPASS filter: {lp_cutoff} Hz (Highpass is OFF)")
+        b_filter, a_filter = butter(FILTER_ORDER, lp_cutoff, btype='lowpass', analog=False, fs=fs)
+    zi_states_filter = [lfilter_zi(b_filter, a_filter) for _ in range(NUM_CHANNELS)]
+
 
     b_notch, a_notch = iirnotch(NOTCH_FREQ, NOTCH_QUALITY_FACTOR, fs=fs)
     zi_states_notch = [lfilter_zi(b_notch, a_notch) for _ in range(NUM_CHANNELS)]
@@ -126,9 +132,16 @@ def filter_worker(raw_data_queue, filtered_data_queues, storage_queue, command_q
                 lp_cutoff = new_settings['lowpass_cutoff']
                 notch_enabled = new_settings['notch_filter_enabled']
 
-                print(f"Redesigning bandpass filter for {hp_cutoff}-{lp_cutoff} Hz")
-                b_bp, a_bp = butter(FILTER_ORDER, [hp_cutoff, lp_cutoff], btype='bandpass', analog=False, fs=fs)
-                zi_states_bp = [lfilter_zi(b_bp, a_bp) for _ in range(NUM_CHANNELS)]  # 重置状态
+                if hp_cutoff > 0:
+                    print(f"Redesigning to BANDPASS filter: {hp_cutoff} - {lp_cutoff} Hz")
+                    b_filter, a_filter = butter(FILTER_ORDER, [hp_cutoff, lp_cutoff], btype='bandpass', analog=False,fs=fs)
+                else:
+                    # 如果高通截止为0，则设计一个低通滤波器
+                    print(f"Redesigning to LOWPASS filter: {lp_cutoff} Hz (Highpass is OFF)")
+                    b_filter, a_filter = butter(FILTER_ORDER, lp_cutoff, btype='lowpass', analog=False, fs=fs)
+
+                # 无论哪种情况，都重置滤波器状态
+                zi_states_filter = [lfilter_zi(b_filter, a_filter) for _ in range(NUM_CHANNELS)]
 
                 if notch_enabled:
                     b_notch, a_notch = iirnotch(NOTCH_FREQ, NOTCH_QUALITY_FACTOR, fs=fs)
@@ -148,12 +161,12 @@ def filter_worker(raw_data_queue, filtered_data_queues, storage_queue, command_q
 
             final_filtered_batch = [[] for _ in range(NUM_CHANNELS)]
             for ch in range(NUM_CHANNELS):
-                bp_filtered_chunk, zi_states_bp[ch] = lfilter(b_bp, a_bp, raw_batch[ch], zi=zi_states_bp[ch])
+                processed_chunk, zi_states_filter[ch] = lfilter(b_filter, a_filter, raw_batch[ch], zi=zi_states_filter[ch])
 
                 if notch_enabled:
-                    final_chunk, zi_states_notch[ch] = lfilter(b_notch, a_notch, bp_filtered_chunk, zi=zi_states_notch[ch])
+                    final_chunk, zi_states_notch[ch] = lfilter(b_notch, a_notch, processed_chunk, zi=zi_states_notch[ch])
                 else:
-                    final_chunk = bp_filtered_chunk   # 如果禁用陷波器，则直接跳过
+                    final_chunk = processed_chunk   # 如果禁用陷波器，则直接跳过
 
                 for value in final_chunk:
                     filtered_data_queues[ch].append(value)

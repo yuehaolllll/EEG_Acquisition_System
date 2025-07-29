@@ -61,7 +61,7 @@ class MainWindow(QMainWindow):
         self.setGeometry(100, 100, 1800, 900)
 
         # =============================================================================
-        # --- UI布局重构开始 (实现顶部通道栏 + 左侧控制面板) ---
+        # --- UI布局 顶部通道栏 + 左侧控制面板 ---
         # =============================================================================
 
         # 1. 主布局 (垂直): 用于容纳“顶部通道栏”和“下方主区域”
@@ -107,7 +107,7 @@ class MainWindow(QMainWindow):
         # --- 3.1 创建左侧的控制面板 ---
         left_control_panel = QWidget()
         left_control_panel.setObjectName("ControlPanel")
-        left_control_panel.setFixedWidth(220)  # 可以稍微宽一点
+        left_control_panel.setFixedWidth(220)
         left_layout = QVBoxLayout(left_control_panel)
         left_layout.setContentsMargins(10, 10, 10, 10)
         left_layout.setSpacing(15)
@@ -115,7 +115,7 @@ class MainWindow(QMainWindow):
 
         # 添加记录控制部分
         record_group = QGroupBox("记录控制")
-        record_group_layout = QGridLayout(record_group)  # 使用网格布局，更灵活
+        record_group_layout = QGridLayout(record_group)  # 使用网格布局
 
         self.status_label = QLabel("未开始")
         self.status_label.setObjectName("StatusLabel_Idle")  # 用于QSS选择
@@ -267,7 +267,7 @@ class MainWindow(QMainWindow):
     def create_menu_bar(self):
         menu_bar = self.menuBar()  # 获取主窗口的菜单栏
 
-        # 创建“文件”菜单 (可选，为未来扩展做准备)
+        # 创建“文件”菜单 (为未来扩展做准备)
         file_menu = menu_bar.addMenu("&文件")
         quit_action = file_menu.addAction("退出")
         quit_action.triggered.connect(self.close)
@@ -519,7 +519,6 @@ class MainWindow(QMainWindow):
             # 计算平均PSD
             avg_psd = np.mean(psd_list_for_avg, axis=0)
 
-            # --- 关键修复：使用 freqs 而不是 self.freq_axis ---
             total_power_freq_range = (freqs >= 1) & (freqs <= 100)
 
             # np.trapz(y, x) 使用梯形法则进行积分，比 np.sum 更精确
@@ -599,9 +598,7 @@ if __name__ == '__main__':
                 padding: 8px 20px; /* OK/Cancel 按钮更大 */
             }
             
-            /* ============================================================= */
-            /* --- 复选框的终极解决方案 --- */
-            /* ============================================================= */
+
             QCheckBox::indicator {
                 width: 18px;
                 height: 18px;
