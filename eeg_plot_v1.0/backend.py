@@ -29,7 +29,7 @@ SAVE_DURATION_S = 60
 SAMPLES_PER_FILE = SAMPLES_PER_SECOND * SAVE_DURATION_S
 
 # --- filter config ---
-HIGHPASS_CUTOFF = 0.1
+HIGHPASS_CUTOFF = 0.5
 LOWPASS_CUTOFF = 100.0
 FILTER_ORDER = 4
 NOTCH_FREQ = 50.0
@@ -97,85 +97,99 @@ def socket_data_receiver(raw_data_queue):
 
 
 def filter_worker(raw_data_queue, filtered_data_queues, storage_queue, command_queue):
-    #global zi_states_hp, zi_states_notch
+    """
+    处理流程: 原始数据 -> [主滤波器(带通/低通)] -> [陷波滤波器] -> 输出队列
+    """
     print("Starting filter worker thread...")
 
+    # --- 初始参数 ---
     fs = SAMPLES_PER_SECOND
-
     hp_cutoff = HIGHPASS_CUTOFF
     lp_cutoff = LOWPASS_CUTOFF
     notch_enabled = True
 
-    # 根据默认值创建初始滤波器
-    if hp_cutoff > 0:
-        print(f"Initializing with BANDPASS filter: {hp_cutoff} - {lp_cutoff} Hz")
-        b_filter, a_filter = butter(FILTER_ORDER, [hp_cutoff, lp_cutoff], btype='bandpass', analog=False, fs=fs)
-    else:
-        print(f"Initializing with LOWPASS filter: {lp_cutoff} Hz (Highpass is OFF)")
-        b_filter, a_filter = butter(FILTER_ORDER, lp_cutoff, btype='lowpass', analog=False, fs=fs)
-    zi_states_filter = [lfilter_zi(b_filter, a_filter) for _ in range(NUM_CHANNELS)]
+    # --- 内部函数，用于设计和重置滤波器，避免代码重复 ---
+    def design_and_reset_filters(hp, lp, notch_on):
+        """根据给定的参数设计滤波器并返回系数和初始状态"""
+        # 1. 设计主滤波器 (带通或低通)
+        if hp > 0.01:
+            print(f"[Filter] Designing BANDPASS filter: {hp:.1f} - {lp:.1f} Hz")
+            b_main, a_main = butter(FILTER_ORDER, [hp, lp], btype='bandpass', analog=False, fs=fs)
+        else:
+            print(f"[Filter] Designing LOWPASS filter: {lp:.1f} Hz (Highpass is OFF)")
+            b_main, a_main = butter(FILTER_ORDER, lp, btype='lowpass', analog=False, fs=fs)
+        zi_main = [lfilter_zi(b_main, a_main) for _ in range(NUM_CHANNELS)]
 
+        # 2. 设计陷波器
+        b_n, a_n, zi_n = None, None, None
+        if notch_on:
+            print("[Filter] Designing NOTCH filter: 50 Hz")
+            b_n, a_n = iirnotch(NOTCH_FREQ, NOTCH_QUALITY_FACTOR, fs=fs)
+            zi_n = [lfilter_zi(b_n, a_n) for _ in range(NUM_CHANNELS)]
 
-    b_notch, a_notch = iirnotch(NOTCH_FREQ, NOTCH_QUALITY_FACTOR, fs=fs)
-    zi_states_notch = [lfilter_zi(b_notch, a_notch) for _ in range(NUM_CHANNELS)]
+        return b_main, a_main, zi_main, b_n, a_n, zi_n
+
+    # --- 初始化滤波器 ---
+    b_filter, a_filter, zi_states_filter, \
+        b_notch, a_notch, zi_states_notch = design_and_reset_filters(hp_cutoff, lp_cutoff, notch_enabled)
 
     while True:
-
+        # --- 1. 检查来自User的命令，更新滤波器设置 ---
         try:
             command = command_queue.get_nowait()
             if command['type'] == 'UPDATE_SETTINGS':
-                new_settings = command['data']
-                print("Filter worker received new settings:", new_settings)
+                settings = command['data']
+                print("[Filter] Received new settings:", settings)
+                hp_cutoff, lp_cutoff, notch_enabled = settings['highpass_cutoff'], settings['lowpass_cutoff'], settings[
+                    'notch_filter_enabled']
 
-                # 重新设计滤波器
-                hp_cutoff = new_settings['highpass_cutoff']
-                lp_cutoff = new_settings['lowpass_cutoff']
-                notch_enabled = new_settings['notch_filter_enabled']
-
-                if hp_cutoff > 0:
-                    print(f"Redesigning to BANDPASS filter: {hp_cutoff} - {lp_cutoff} Hz")
-                    b_filter, a_filter = butter(FILTER_ORDER, [hp_cutoff, lp_cutoff], btype='bandpass', analog=False,fs=fs)
-                else:
-                    # 如果高通截止为0，则设计一个低通滤波器
-                    print(f"Redesigning to LOWPASS filter: {lp_cutoff} Hz (Highpass is OFF)")
-                    b_filter, a_filter = butter(FILTER_ORDER, lp_cutoff, btype='lowpass', analog=False, fs=fs)
-
-                # 无论哪种情况，都重置滤波器状态
-                zi_states_filter = [lfilter_zi(b_filter, a_filter) for _ in range(NUM_CHANNELS)]
-
-                if notch_enabled:
-                    b_notch, a_notch = iirnotch(NOTCH_FREQ, NOTCH_QUALITY_FACTOR, fs=fs)
-                    zi_states_notch = [lfilter_zi(b_notch, a_notch) for _ in range(NUM_CHANNELS)]
-
+                # 使用辅助函数重新设计所有滤波器并重置状态
+                b_filter, a_filter, zi_states_filter, \
+                    b_notch, a_notch, zi_states_notch = design_and_reset_filters(hp_cutoff, lp_cutoff, notch_enabled)
         except queue.Empty:
-            pass  # 队列为空是正常的
+            pass  # 队列为空是正常的，继续执行
 
+        # --- 2. 从数据接收线程获取一批原始数据 ---
         try:
             raw_batch = raw_data_queue.get(timeout=0.1)
             if raw_batch is None:
-                storage_queue.put(None)  # 传递结束信号
-                # 也通知绘图队列结束
+                storage_queue.put(None)
                 for q in filtered_data_queues:
-                    q.append(None)  # 发送哨兵值
+                    q.append(None)
                 break
 
+            # --- 3. 对数据进行串联滤波处理 ---
             final_filtered_batch = [[] for _ in range(NUM_CHANNELS)]
             for ch in range(NUM_CHANNELS):
-                processed_chunk, zi_states_filter[ch] = lfilter(b_filter, a_filter, raw_batch[ch], zi=zi_states_filter[ch])
 
+                # 1、: 对原始数据进行带通/低通滤波
+                processed_chunk, zi_states_filter[ch] = lfilter(
+                    b_filter, a_filter, raw_batch[ch], zi=zi_states_filter[ch]
+                )
+
+                # 2、: 对上一步的结果进行陷波滤波
                 if notch_enabled:
-                    final_chunk, zi_states_notch[ch] = lfilter(b_notch, a_notch, processed_chunk, zi=zi_states_notch[ch])
+                    final_chunk, zi_states_notch[ch] = lfilter(
+                        b_notch, a_notch, processed_chunk, zi=zi_states_notch[ch]
+                    )
                 else:
-                    final_chunk = processed_chunk   # 如果禁用陷波器，则直接跳过
+                    # 如果禁用陷波器，则直接使用上一步的结果
+                    final_chunk = processed_chunk
 
+                # --- 流程结束 ---
+
+                # 将最终处理好的数据分发到绘图队列
                 for value in final_chunk:
                     filtered_data_queues[ch].append(value)
+
+                # 将最终处理好的数据添加到准备存储的批次中
                 final_filtered_batch[ch].extend(final_chunk)
 
+            # 将整批处理好的数据放入存储队列
             storage_queue.put(final_filtered_batch)
 
         except queue.Empty:
-            continue  # 数据队列为空也是正常的
+            continue  # 数据队列暂时为空，继续循环等待
 
     print("Filter worker thread finished.")
 

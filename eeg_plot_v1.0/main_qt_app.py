@@ -10,7 +10,7 @@ from queue import Queue
 import pyqtgraph as pg
 from PyQt6.QtWidgets import (QApplication, QMainWindow, QWidget, QGridLayout,
                              QVBoxLayout, QCheckBox, QHBoxLayout, QFrame, QLabel,
-                             QPushButton, QSizePolicy, QLineEdit, QProgressBar, QGroupBox)
+                             QPushButton, QSizePolicy, QLineEdit, QProgressBar, QGroupBox, QFileDialog)
 from PyQt6.QtCore import QTimer, Qt, QEvent
 from PyQt6.QtGui import QIcon
 import threading
@@ -19,13 +19,14 @@ from scipy import signal
 
 import backend
 from SettingsDialog import SettingsDialog
+import scipy.io as sio
 
 # --- config ---
 NUM_CHANNELS = backend.NUM_CHANNELS
 SAMPLES_PER_SECOND = backend.SAMPLES_PER_SECOND
 PLOT_DURATION_S = 5
 PLOT_SAMPLES = int(SAMPLES_PER_SECOND * PLOT_DURATION_S)
-PLOT_UPDATE_INTERVAL_MS = 40                                       # 刷新率 (ms), 40ms -> 25Hz
+PLOT_UPDATE_INTERVAL_MS = 100                                      # 刷新率 (ms), 40ms -> 25Hz
 NFFT = PLOT_SAMPLES
 MAX_FREQ_TO_SHOW = 100
 
@@ -33,6 +34,10 @@ MAX_FREQ_TO_SHOW = 100
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
+
+        # --- 模式跟踪 ---
+        self.is_offline_mode = False
+        self.SAMPLES_PER_SECOND = backend.SAMPLES_PER_SECOND
 
         self.app_settings = {
             'highpass_cutoff': backend.HIGHPASS_CUTOFF,
@@ -47,7 +52,6 @@ class MainWindow(QMainWindow):
         self.command_queue = Queue()
         self.marker_lines = []
         self.filtered_data_queues = [deque(maxlen=PLOT_SAMPLES) for _ in range(NUM_CHANNELS)]
-
         # --- defination of color list ---
         self.channel_colors = [
             (217, 83, 25), (0, 115, 189), (119, 172, 48), (237, 177, 32),
@@ -116,6 +120,8 @@ class MainWindow(QMainWindow):
         # 添加记录控制部分
         record_group = QGroupBox("记录控制")
         record_group_layout = QGridLayout(record_group)  # 使用网格布局
+        record_group_layout.setHorizontalSpacing(10)
+        record_group_layout.setVerticalSpacing(5)
 
         self.status_label = QLabel("未开始")
         self.status_label.setObjectName("StatusLabel_Idle")  # 用于QSS选择
@@ -157,6 +163,7 @@ class MainWindow(QMainWindow):
         # 添加脑电节律分析部分
         rhythm_group = QGroupBox("脑电节律分析 (Avg)")
         rhythm_bars_layout = QGridLayout()
+        rhythm_bars_layout.setVerticalSpacing(8)
 
         self.rhythm_bands = {
             'Delta (1-4 Hz)': (1, 4, '#7f8c8d'),
@@ -269,6 +276,14 @@ class MainWindow(QMainWindow):
 
         # 创建“文件”菜单 (为未来扩展做准备)
         file_menu = menu_bar.addMenu("&文件")
+
+        open_action = file_menu.addAction("打开 .mat 文件...")
+        open_action.triggered.connect(self.open_mat_file)
+        self.return_to_live_action = file_menu.addAction("返回实时监控")
+        self.return_to_live_action.triggered.connect(self.return_to_live_mode)
+        self.return_to_live_action.setEnabled(False)  # 初始时不可用
+        file_menu.addSeparator()
+
         quit_action = file_menu.addAction("退出")
         quit_action.triggered.connect(self.close)
 
@@ -413,16 +428,16 @@ class MainWindow(QMainWindow):
             self.record_button.setStyleSheet("background-color: #f39c12; color: white; font-weight: bold;")
             self.stop_button.setEnabled(True)
             self.mark_event_button.setEnabled(True)
-            self.status_label.setText("状态: 正在记录...")
+            self.status_label.setText("正在记录...")
             self.status_label.setObjectName("StatusLabel_Recording")
-            self.status_label.setStyleSheet("color: green;")
+            #self.status_label.setStyleSheet("color: green;")
         else:
             # 这是“暂停记录”的逻辑
             self.recording_event.clear()  # 设置Event为False
             self.record_button.setText("继续记录")
             self.record_button.setStyleSheet("background-color: #2ecc71; color: white; font-weight: bold;")
             self.mark_event_button.setEnabled(False)
-            self.status_label.setText("状态: 记录暂停")
+            self.status_label.setText("记录暂停")
             self.status_label.setObjectName("StatusLabel_Paused")
             #self.status_label.setStyleSheet("color: orange;")
 
@@ -439,7 +454,7 @@ class MainWindow(QMainWindow):
         self.record_button.setStyleSheet("background-color: #2ecc71; color: white; font-weight: bold;")
         self.stop_button.setEnabled(False)
         self.mark_event_button.setEnabled(False)
-        self.status_label.setText("状态: 记录已停止")
+        self.status_label.setText("记录已停止")
         self.status_label.setObjectName("StatusLabel_Stopped")
         #self.status_label.setStyleSheet("color: red;")
 
@@ -482,7 +497,9 @@ class MainWindow(QMainWindow):
         event.accept()
 
     def update_plots(self):
-        """定时器调用的更新函数 (最终修正版)"""
+        """定时器调用的更新函数 """
+        if self.is_offline_mode:
+            return
         # 准备用于计算平均功率的变量
         psd_list_for_avg = []
 
@@ -532,6 +549,136 @@ class MainWindow(QMainWindow):
                     relative_power = (band_power / total_power) * 100
                     self.rhythm_progress_bars[name].setValue(int(relative_power))
 
+    def open_mat_file(self):
+        """当用户点击“打开 .mat 文件...”时调用"""
+        # 如果已经在离线模式，先返回实时模式再打开新文件
+        if self.is_offline_mode:
+            self.return_to_live_mode()
+
+        file_path, _ = QFileDialog.getOpenFileName(
+            self, "打开EEG数据文件", "data/", "MAT-files (*.mat)"
+        )
+
+        if file_path:
+            print(f"Opening file: {file_path}")
+            try:
+                # 1. 切换到离线模式
+                self.is_offline_mode = True
+                self.timer.stop()  # 停止实时更新
+                self.return_to_live_action.setEnabled(True)  # 启用“返回实时”按钮
+
+                # 2. 更新UI状态
+                self.set_ui_for_offline_mode(True)
+
+                # 3. 加载.mat文件
+                mat_data = sio.loadmat(file_path)
+
+                # 4. 绘制离线数据
+                self.plot_offline_data(mat_data)
+
+            except Exception as e:
+                print(f"Error loading or plotting .mat file: {e}")
+                self.return_to_live_mode()  # 如果出错，尝试恢复到实时模式
+
+    def plot_offline_data(self, mat_data):
+        """将从.mat文件加载的数据绘制到图表上"""
+        try:
+            fs = mat_data.get('fs', [[self.SAMPLES_PER_SECOND]])[0][0]
+            events = mat_data.get('events', np.array([]))
+
+            # 绘制前先清空所有图表
+            self.clear_all_plots()
+
+            for i in range(NUM_CHANNELS):
+                ch_name = f'CH{i + 1}'
+                if ch_name in mat_data:
+                    ch_data = mat_data[ch_name].flatten()
+                    num_samples = len(ch_data)
+                    if num_samples == 0: continue
+
+                    # 1. 绘制时域图
+                    time_axis_offline = np.arange(num_samples) / fs
+                    self.time_curves[i].setData(x=time_axis_offline, y=ch_data)
+                    self.time_plots[i].setXRange(0, time_axis_offline[-1])
+
+                    # 2. 绘制事件标记
+                    if events.size > 0:
+                        for event_info in events:
+                            # 兼容不同格式的 event_info
+                            if isinstance(event_info, (list, np.ndarray)) and len(event_info) >= 2:
+                                event_time, event_label = event_info[0], event_info[1]
+                                event_line = pg.InfiniteLine(pos=float(event_time), angle=90, movable=False,
+                                                             pen=pg.mkPen('g', width=2, style=Qt.PenStyle.DashLine),
+                                                             label=str(event_label))
+                                self.time_plots[i].addItem(event_line)
+
+                    # 3. 绘制频域图
+                    freqs, psd = signal.welch(ch_data - np.mean(ch_data), fs=fs, nperseg=min(num_samples, 2048))
+                    freq_mask = freqs <= MAX_FREQ_TO_SHOW
+                    self.freq_curves[i].setData(x=freqs[freq_mask], y=psd[freq_mask])
+
+            print("Offline data plotted successfully.")
+        except Exception as e:
+            print(f"An error occurred during offline plotting: {e}")
+
+    def return_to_live_mode(self):
+        """恢复到实时监控模式"""
+        if not self.is_offline_mode:
+            return
+
+        print("Returning to live monitoring mode...")
+        # 1. 切换模式标志
+        self.is_offline_mode = False
+        self.return_to_live_action.setEnabled(False)  # 禁用“返回实时”按钮
+
+        # 2. 清空图表和数据队列
+        self.clear_all_plots()
+        for q in self.filtered_data_queues:
+            q.clear()
+
+        # 3. 恢复UI状态
+        self.set_ui_for_offline_mode(False)
+
+        # 4. 恢复实时绘图的X轴范围
+        for plot in self.time_plots:
+            plot.setXRange(-PLOT_DURATION_S, 0)
+
+        # 5. 重新启动定时器
+        self.timer.start()
+
+    def clear_all_plots(self):
+        """清空所有图表上的曲线和额外项目 """
+        for i in range(NUM_CHANNELS):
+            # 清除主曲线
+            self.time_curves[i].clear()
+            self.freq_curves[i].clear()
+
+            # 移除所有额外添加的item（如事件标记线）
+            items_to_remove = [item for item in self.time_plots[i].items() if isinstance(item, pg.InfiniteLine)]
+            for item in items_to_remove:
+                self.time_plots[i].removeItem(item)
+
+    def set_ui_for_offline_mode(self, offline):
+        """根据模式启用/禁用UI控件"""
+        if offline:
+            # 进入离线模式，禁用实时功能
+            self.record_button.setEnabled(False)
+            self.stop_button.setEnabled(False)
+            self.mark_event_button.setEnabled(False)
+            self.status_label.setText("离线浏览模式")
+            self.status_label.setObjectName("StatusLabel_Idle")
+        else:
+            # 返回实时模式，恢复初始状态
+            self.record_button.setEnabled(True)
+            self.stop_button.setEnabled(False)  # 停止按钮初始是禁用的
+            self.mark_event_button.setEnabled(False)  # 标记按钮初始也是禁用的
+            self.status_label.setText("未开始")
+            self.status_label.setObjectName("StatusLabel_Idle")
+
+        # 统一刷新样式
+        self.status_label.style().unpolish(self.status_label)
+        self.status_label.style().polish(self.status_label)
+
 
 if __name__ == '__main__':
     import os
@@ -570,7 +717,7 @@ if __name__ == '__main__':
                 border: 1px solid #D0D0D0;
                 border-radius: 8px;
                 margin-top: 10px;
-                padding: 10px;
+                padding: 10px 10px 15px 10px;
             }
             QGroupBox::title {
                 subcontrol-origin: margin;
