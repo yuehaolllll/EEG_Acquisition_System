@@ -583,7 +583,11 @@ class MainWindow(QMainWindow):
     def plot_offline_data(self, mat_data):
         """将从.mat文件加载的数据绘制到图表上"""
         try:
-            fs = mat_data.get('fs', [[self.SAMPLES_PER_SECOND]])[0][0]
+            fs_val = mat_data.get('fs')
+            if fs_val is not None:
+                fs = fs_val[0, 0]
+            else:
+                fs = self.SAMPLES_PER_SECOND
             events = mat_data.get('events', np.array([]))
 
             # 绘制前先清空所有图表
@@ -606,7 +610,12 @@ class MainWindow(QMainWindow):
                         for event_info in events:
                             # 兼容不同格式的 event_info
                             if isinstance(event_info, (list, np.ndarray)) and len(event_info) >= 2:
-                                event_time, event_label = event_info[0], event_info[1]
+                                event_time_raw = event_info[0]
+                                event_time = float(
+                                    np.isscalar(event_time_raw) and event_time_raw or event_time_raw.item())
+                                event_label_raw = event_info[1]
+                                event_label = str(
+                                    np.isscalar(event_label_raw) and event_label_raw or event_label_raw.item())
                                 event_line = pg.InfiniteLine(pos=float(event_time), angle=90, movable=False,
                                                              pen=pg.mkPen('g', width=2, style=Qt.PenStyle.DashLine),
                                                              label=str(event_label))
