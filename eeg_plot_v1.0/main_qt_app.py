@@ -108,7 +108,6 @@ class MainWindow(QMainWindow):
 
         top_channels_layout.addStretch(1)  # 把复选框推到左边
 
-        #top_channels_layout.addSeparator()  # 可选：加个分隔符
         self.toggle_view_button = QPushButton("叠加模式")
         self.toggle_view_button.setCheckable(True)  # 让它像一个开关
         self.toggle_view_button.toggled.connect(self.toggle_view_mode)
@@ -234,11 +233,6 @@ class MainWindow(QMainWindow):
         self.plot_stack.addWidget(self.multi_plot_widget)
         self.plot_stack.addWidget(self.overlay_plot_widget)
 
-        # plot_area_widget = QWidget()
-        # plot_layout = QGridLayout(plot_area_widget)
-        # plot_layout.setColumnStretch(0, 3)
-        # plot_layout.setColumnStretch(1, 1)
-
         # 将左侧控制面板和右侧绘图区添加到下方主区域的水平布局中
         bottom_layout.addWidget(left_control_panel)
         bottom_layout.addWidget(self.plot_stack)
@@ -253,7 +247,7 @@ class MainWindow(QMainWindow):
         self.setCentralWidget(central_widget)
 
         # =============================================================================
-        # --- UI布局重构结束 ---
+        # --- UI布局结束 ---
         # =============================================================================
 
         self.create_menu_bar()
@@ -326,7 +320,7 @@ class MainWindow(QMainWindow):
     def create_menu_bar(self):
         menu_bar = self.menuBar()  # 获取主窗口的菜单栏
 
-        # 创建“文件”菜单 (为未来扩展做准备)
+        # 创建“文件”菜单
         file_menu = menu_bar.addMenu("&文件")
 
         open_action = file_menu.addAction("打开 .mat 文件...")
@@ -385,9 +379,9 @@ class MainWindow(QMainWindow):
 
         # 如果用户点击了"OK"并且输入了非空的新名称
         if ok and new_name:
-            # 检查名称是否已存在 (避免重复)
+            # 检查名称是否已存在
             if new_name in self.channel_names:
-                # (可选) 可以弹出一个警告框
+                # 弹出一个警告框
                 print(f"Warning: Channel name '{new_name}' already exists.")
                 return
 
@@ -792,7 +786,6 @@ class MainWindow(QMainWindow):
                     self.time_plots[i].setXRange(0, time_axis_offline[-1])
 
                     # --- 3. 绘制叠加图模式 ---
-                    # ** 核心新增部分 **
                     offset_data = ch_data - i * self.OVERLAY_CHANNEL_OFFSET
                     self.overlay_curves[i].setData(x=time_axis_offline, y=offset_data)
 
@@ -813,20 +806,19 @@ class MainWindow(QMainWindow):
                                                                    label=event_label)
                                 self.time_plots[i].addItem(event_line_multi)
 
-                                # ** 新增: 在叠加图上也添加标记 **
+                                # ** 在叠加图上也添加标记 **
                                 event_line_overlay = pg.InfiniteLine(pos=event_time, angle=90, movable=False,
                                                                      pen=pg.mkPen('g', width=2,
                                                                                   style=Qt.PenStyle.DashLine),
                                                                      label=event_label)
                                 self.overlay_plot_widget.addItem(event_line_overlay)
 
-                    # --- 5. 绘制频域图 (这部分不变) ---
+                    # --- 5. 绘制频域图 ---
                     freqs, psd = signal.welch(ch_data - np.mean(ch_data), fs=fs, nperseg=min(num_samples, 2048))
                     freq_mask = freqs <= MAX_FREQ_TO_SHOW
                     self.freq_curves[i].setData(x=freqs[freq_mask], y=psd[freq_mask])
 
             # --- 6. 统一设置叠加图的X轴范围 ---
-            # ** 新增部分 **
             if 'CH1' in mat_data or (len(loaded_channel_names) > 0 and loaded_channel_names[0] in mat_data):
                 # 以第一个通道的数据长度为准来设置X轴
                 first_ch_name = loaded_channel_names[0]
@@ -880,6 +872,15 @@ class MainWindow(QMainWindow):
             items_to_remove = [item for item in self.time_plots[i].items() if isinstance(item, pg.InfiniteLine)]
             for item in items_to_remove:
                 self.time_plots[i].removeItem(item)
+
+        for curve in self.overlay_curves:
+            curve.clear()
+        items_to_remove_overlay = [item for item in self.overlay_plot_widget.items() if
+                                   isinstance(item, pg.InfiniteLine)]
+        for item in items_to_remove_overlay:
+            self.overlay_plot_widget.removeItem(item)
+
+        print("All plots cleared.")
 
     def set_ui_for_offline_mode(self, offline):
         """根据模式启用/禁用UI控件"""

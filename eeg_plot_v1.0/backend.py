@@ -241,7 +241,6 @@ def data_storage_worker(storage_queue, recording_event):
 
             # --- 处理停止或退出 ---
             if is_stop_command or is_exit_command:
-                # *** 关键修正点：从停止命令中提取通道名 ***
                 if is_stop_command:
                     channel_names_for_saving = batch[1]
 
