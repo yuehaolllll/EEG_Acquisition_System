@@ -31,14 +31,14 @@
 ![alt text](images/background_noise.png)  
 *根据参考手册的提示，在输入短路模式下所采集到的信号为系统的本底噪声。在增益为24，±2.5V参考电压的背景下，系统的本底噪声处于1uV的范围内，性能还算可以*  
 ###  ECG Test
-![alt text](images/ECG.png)  
+![alt text](images/ECG-new.png)  
 *如图所示的通道一为采集到的心电信号波形图。心电信号主要由P波（心房收缩）、QRS波群（心室收缩）和T波（心室舒张）组成，幅度范围为-0.5mV到+2.0mV之间。经验证该信通可以采集较为精确心电信号*  
 ### EMG Test
-![alt text](images/EMG.png) 
+![alt text](images/EMG-new.png) 
 *如图所示的通道一为采集到的肌电信号波形图。该图反映整个系统可以准确采集肌电信号，观察右侧的频率波形，也能体现出典型的肌电信号频域特征*  
 ### EOG Test
-![alt text](images/EOG.png)  
+![alt text](images/EOG-new.png)  
 *如图所示的通道一为采集到的眼动伪影波形图。图中可以看出眼动信号可以被准确采集*  
 ### EEG Test
-![alt text](images/Alpha_wave.png)
+![alt text](images/EEG-new.png)
 *如图所示的通道一为采集到的脑电信号波形图。此图中可以清晰看到10Hz频率附近幅度明显，这就是Alpha波。*  
