@@ -196,33 +196,39 @@ def filter_worker(raw_data_queue, filtered_data_queues, storage_queue, command_q
 
 def data_storage_worker(storage_queue, recording_event):
     print("Starting data storage thread...")
+    # 默认通道名
+    channel_names_for_saving = [f'CH{i + 1}' for i in range(NUM_CHANNELS)]
     data_to_save = [[] for _ in range(NUM_CHANNELS)]
-
     events_to_save = []
 
     timestamp = None
     filename = None
     is_file_open = False
-
     recording_start_time = None
+
     while True:
         try:
             batch = storage_queue.get(timeout=0.1)
 
-            if isinstance(batch, tuple) and batch[0] == 'MARKER':
-                # 标记格式: ('MARKER', absolute_timestamp)
-                if recording_event.is_set():  # 只在记录期间才保存标记
-                    event_time = batch[1]
-                    event_label = batch[2]
-                    # 计算相对于记录开始的秒数
+            # --- 逻辑判断部分 ---
+            is_marker = isinstance(batch, tuple) and batch[0] == 'MARKER'
+            is_stop_command = isinstance(batch, tuple) and batch[0] == 'STOP_RECORDING'
+            is_exit_command = batch is None
+            is_data_batch = not (is_marker or is_stop_command or is_exit_command)
+
+            # --- 处理标记 ---
+            if is_marker:
+                if recording_event.is_set() and recording_start_time is not None:
+                    _, event_time, event_label = batch
                     relative_time = event_time - recording_start_time
                     events_to_save.append([relative_time, event_label])
-                    print(f"Marker logged at {relative_time:.3f} seconds from recording start.")
+                    print(f"Marker logged at {relative_time:.3f} seconds.")
                 else:
                     print("Marker ignored (not recording).")
-                continue
+                continue  # 处理完标记后继续下一次循环
 
-            if recording_event.is_set():
+            # --- 处理数据 ---
+            if recording_event.is_set() and is_data_batch:
                 if not is_file_open:
                     timestamp = time.strftime("%Y%m%d_%H%M%S")
                     filename = f"data/EEG_data_{timestamp}.mat"
@@ -233,24 +239,38 @@ def data_storage_worker(storage_queue, recording_event):
                 for ch in range(NUM_CHANNELS):
                     data_to_save[ch].extend(batch[ch])
 
-            if batch == 'STOP_RECORDING' or batch is None:
+            # --- 处理停止或退出 ---
+            if is_stop_command or is_exit_command:
+                # *** 关键修正点：从停止命令中提取通道名 ***
+                if is_stop_command:
+                    channel_names_for_saving = batch[1]
+
                 if data_to_save and any(data_to_save):
-                    print(f"Stopping recording. Finalizing save to {filename}...")
-                    mat_data = {f'CH{i + 1}': np.array(data_to_save[i]) for i in range(NUM_CHANNELS)}
+                    print(f"Finalizing save to {filename} with names: {channel_names_for_saving}")
+
+                    # 使用正确的通道名保存
+                    mat_data = {
+                        channel_names_for_saving[i]: np.array(data_to_save[i])
+                        for i in range(NUM_CHANNELS)
+                    }
                     mat_data['fs'] = SAMPLES_PER_SECOND
                     mat_data['events'] = np.array(events_to_save, dtype=object)
+                    mat_data['channel_order'] = np.array(channel_names_for_saving, dtype=object)  # 也保存通道顺序
                     sio.savemat(filename, mat_data)
                     print("File saved.")
                 else:
-                    print("Stop command received, but no data to save.")
 
+                    print("Stop/Exit command received, but no data to save.")
+
+                # 重置状态
                 data_to_save = [[] for _ in range(NUM_CHANNELS)]
                 events_to_save = []
                 is_file_open = False
                 recording_start_time = None
+                channel_names_for_saving = [f'CH{i + 1}' for i in range(NUM_CHANNELS)]  # 恢复默认
 
-                if batch is None:  # 如果是程序退出信号
-                    break
+                if is_exit_command:
+                    break  # 如果是程序退出，则跳出循环
 
         except queue.Empty:
             continue

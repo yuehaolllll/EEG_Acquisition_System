@@ -10,7 +10,8 @@ from queue import Queue
 import pyqtgraph as pg
 from PyQt6.QtWidgets import (QApplication, QMainWindow, QWidget, QGridLayout,
                              QVBoxLayout, QCheckBox, QHBoxLayout, QFrame, QLabel,
-                             QPushButton, QSizePolicy, QLineEdit, QProgressBar, QGroupBox, QFileDialog)
+                             QPushButton, QSizePolicy, QLineEdit, QProgressBar,
+                             QGroupBox, QFileDialog, QInputDialog, QMenu, QStackedWidget)
 from PyQt6.QtCore import QTimer, Qt, QEvent
 from PyQt6.QtGui import QIcon
 import threading
@@ -37,8 +38,10 @@ class MainWindow(QMainWindow):
 
         # --- 模式跟踪 ---
         self.is_offline_mode = False
+        self.is_overlay_mode = False
+        self.OVERLAY_CHANNEL_OFFSET = 100
         self.SAMPLES_PER_SECOND = backend.SAMPLES_PER_SECOND
-
+        self.channel_names = [f"CH{i + 1}" for i in range(NUM_CHANNELS)]
         self.app_settings = {
             'highpass_cutoff': backend.HIGHPASS_CUTOFF,
             'lowpass_cutoff': 100.0,
@@ -84,7 +87,9 @@ class MainWindow(QMainWindow):
         self.channel_buttons = []
         for i in range(NUM_CHANNELS):
             # 创建 QPushButton
-            button = QPushButton(f"CH{i + 1}")
+            button = QPushButton(self.channel_names[i])
+            button.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
+            button.customContextMenuRequested.connect(lambda pos, index=i: self.show_channel_rename_menu(index, pos))
             # 设置为可切换状态
             button.setCheckable(True)
             # 默认设置为选中状态
@@ -102,6 +107,12 @@ class MainWindow(QMainWindow):
             self.channel_buttons.append(button)
 
         top_channels_layout.addStretch(1)  # 把复选框推到左边
+
+        #top_channels_layout.addSeparator()  # 可选：加个分隔符
+        self.toggle_view_button = QPushButton("叠加模式")
+        self.toggle_view_button.setCheckable(True)  # 让它像一个开关
+        self.toggle_view_button.toggled.connect(self.toggle_view_mode)
+        top_channels_layout.addWidget(self.toggle_view_button)
 
         # 3. 创建下方的主内容区
         bottom_area_widget = QWidget()
@@ -206,14 +217,31 @@ class MainWindow(QMainWindow):
         left_layout.addStretch(1)
 
         # --- 3.2 创建右侧的绘图区域 ---
-        plot_area_widget = QWidget()
-        plot_layout = QGridLayout(plot_area_widget)
+        self.plot_stack = QStackedWidget()
+        # 视图 0: 多图网格
+        self.multi_plot_widget = QWidget()
+        plot_layout = QGridLayout(self.multi_plot_widget)
         plot_layout.setColumnStretch(0, 3)
         plot_layout.setColumnStretch(1, 1)
 
+        # 视图 1: 叠加图
+        self.overlay_plot_widget = pg.PlotWidget(title="Overlay View")
+        self.overlay_plot_widget.setLabel('left', 'Channels')
+        self.overlay_plot_widget.setLabel('bottom', 'Time (s)')
+        self.overlay_plot_widget.showGrid(x=True, y=True, alpha=0.3)
+        self.overlay_plot_widget.getAxis('left').setTicks([])
+
+        self.plot_stack.addWidget(self.multi_plot_widget)
+        self.plot_stack.addWidget(self.overlay_plot_widget)
+
+        # plot_area_widget = QWidget()
+        # plot_layout = QGridLayout(plot_area_widget)
+        # plot_layout.setColumnStretch(0, 3)
+        # plot_layout.setColumnStretch(1, 1)
+
         # 将左侧控制面板和右侧绘图区添加到下方主区域的水平布局中
         bottom_layout.addWidget(left_control_panel)
-        bottom_layout.addWidget(plot_area_widget)
+        bottom_layout.addWidget(self.plot_stack)
 
         # 4. 将顶部通道栏和下方主区域添加到主布局中
         main_layout.addWidget(top_channels_bar)
@@ -237,13 +265,18 @@ class MainWindow(QMainWindow):
         self.time_curves = []
         self.freq_curves = []
 
+        self.overlay_curves = []
+        self.overlay_ch_labels = []
+
         self.time_axis = np.linspace(-PLOT_DURATION_S, 0, PLOT_SAMPLES)
         self.freq_axis = np.fft.rfftfreq(NFFT, d=1.0 / SAMPLES_PER_SECOND)
         freq_mask = self.freq_axis <= MAX_FREQ_TO_SHOW
 
         for i in range(NUM_CHANNELS):
-            current_color = self.channel_colors[i % len(self.channel_colors)]
-            plot_time = pg.PlotWidget(title=f"Channel {i + 1} - Time Domain")
+            #current_color = self.channel_colors[i % len(self.channel_colors)]
+            current_color = self.channel_colors[i]
+
+            plot_time = pg.PlotWidget(title=f"{self.channel_names[i]} - Time Domain")
             plot_time.setLabel('left', 'Amplitude (uV)')
             plot_time.setLabel('bottom', 'Time (s)')
             plot_time.showGrid(x=True, y=True, alpha=0.3)
@@ -252,7 +285,7 @@ class MainWindow(QMainWindow):
             self.time_plots.append(plot_time)
             self.time_curves.append(curve_time)
 
-            plot_freq = pg.PlotWidget(title=f"CH{i + 1} - Frequency Domain")
+            plot_freq = pg.PlotWidget(title=f"{self.channel_names[i]} - Frequency Domain")
             plot_freq.setLabel('left', 'Magnitude')
             plot_freq.setLabel('bottom', 'Frequency (Hz)')
             plot_freq.showGrid(x=True, y=True, alpha=0.3)
@@ -264,6 +297,25 @@ class MainWindow(QMainWindow):
 
             plot_layout.addWidget(plot_time, i, 0)
             plot_layout.addWidget(plot_freq, i, 1)
+
+            # /* overlay curve */
+            # 1. 创建曲线
+            pen_overlay = pg.mkPen(color=current_color, width=1)
+            overlay_curve = self.overlay_plot_widget.plot(pen=pen_overlay)
+            self.overlay_curves.append(overlay_curve)
+            # 2. 创建通道名称标签
+            ch_label = pg.TextItem(self.channel_names[i], color=current_color, anchor=(0, 0.5))
+            # 计算标签的初始位置
+            label_y_pos = -i * self.OVERLAY_CHANNEL_OFFSET
+            ch_label.setPos(-PLOT_DURATION_S, label_y_pos)  # 放在最左侧
+            self.overlay_plot_widget.addItem(ch_label)
+            self.overlay_ch_labels.append(ch_label)
+            # 设置叠加图的Y轴范围
+            self.overlay_plot_widget.setYRange(
+                -(NUM_CHANNELS) * self.OVERLAY_CHANNEL_OFFSET,
+                1 * self.OVERLAY_CHANNEL_OFFSET
+            )
+
             self.plot_widgets_per_channel.append((plot_time, plot_freq))
 
         # --- 设置定时器 ---
@@ -306,6 +358,60 @@ class MainWindow(QMainWindow):
             self.apply_new_settings(new_settings)
         else:
             print("Settings dialog cancelled.")
+
+    def show_channel_rename_menu(self, channel_index, position):
+        """当在通道按钮上右键点击时，显示一个菜单"""
+        menu = QMenu()
+        rename_action = menu.addAction("重命名通道...")
+
+        # 使用 self.channel_buttons[channel_index] 来获取正确的按钮
+        action = menu.exec(self.channel_buttons[channel_index].mapToGlobal(position))
+
+        if action == rename_action:
+            self.rename_channel(channel_index)
+
+    def rename_channel(self, channel_index):
+        """弹出一个对话框来重命名指定的通道"""
+        current_name = self.channel_names[channel_index]
+
+        # 弹出输入对话框
+        new_name, ok = QInputDialog.getText(
+            self,
+            "重命名通道",
+            f"为通道 {channel_index + 1} 输入新名称:",
+            QLineEdit.EchoMode.Normal,
+            current_name
+        )
+
+        # 如果用户点击了"OK"并且输入了非空的新名称
+        if ok and new_name:
+            # 检查名称是否已存在 (避免重复)
+            if new_name in self.channel_names:
+                # (可选) 可以弹出一个警告框
+                print(f"Warning: Channel name '{new_name}' already exists.")
+                return
+
+            print(f"Renaming channel {channel_index + 1} from '{current_name}' to '{new_name}'")
+
+            # 1. 更新数据结构
+            self.channel_names[channel_index] = new_name
+
+            # 2. 更新UI
+            self.channel_buttons[channel_index].setText(new_name)
+            time_plot, freq_plot = self.plot_widgets_per_channel[channel_index]
+            time_plot.setTitle(f"{new_name} - Time Domain")
+            freq_plot.setTitle(f"{new_name} - Frequency Domain")
+
+            self.overlay_ch_labels[channel_index].setText(new_name)
+
+    def toggle_view_mode(self, checked):
+        self.is_overlay_mode = checked
+        if checked:
+            self.plot_stack.setCurrentWidget(self.overlay_plot_widget)
+            self.toggle_view_button.setText("多图模式")
+        else:
+            self.plot_stack.setCurrentWidget(self.multi_plot_widget)
+            self.toggle_view_button.setText("叠加模式")
 
     def apply_new_settings(self, new_settings):
 
@@ -447,7 +553,8 @@ class MainWindow(QMainWindow):
     def stop_recording(self):
         # 停止逻辑
         self.recording_event.clear()
-        self.storage_queue.put('STOP_RECORDING')  # 发送停止命令
+        stop_command = ('STOP_RECORDING', self.channel_names)
+        self.storage_queue.put(stop_command)  # 发送停止命令
 
         # 恢复UI到初始状态
         self.record_button.setText("开始记录")
@@ -471,6 +578,51 @@ class MainWindow(QMainWindow):
         # 根据传入的状态设置它们的可见性
         time_plot_widget.setVisible(is_visible)
         freq_plot_widget.setVisible(is_visible)
+
+        overlay_curve = self.overlay_curves[channel_index]
+        overlay_label = self.overlay_ch_labels[channel_index]
+
+        overlay_curve.setVisible(is_visible)
+        overlay_label.setVisible(is_visible)
+
+        if self.is_offline_mode:
+            self.recalculate_offline_psd_and_rhythms()
+
+    def recalculate_offline_psd_and_rhythms(self):
+        """
+        在离线模式下，根据当前可见的通道重新计算平均PSD和脑电节律。
+        """
+        psd_list_for_avg = []
+
+        # 遍历所有通道，只收集当前可见通道的频域数据
+        for i in range(NUM_CHANNELS):
+            if self.channel_buttons[i].isChecked():
+                # 从频域曲线中直接获取数据
+                curve = self.freq_curves[i]
+                if curve.yData is not None and len(curve.yData) > 0:
+                    psd_list_for_avg.append(curve.yData)
+
+        # 如果有可见的通道，则进行计算
+        if psd_list_for_avg:
+            avg_psd = np.mean(psd_list_for_avg, axis=0)
+
+            # 获取频域轴 (从任意一个频域曲线)
+            freqs = self.freq_curves[0].xData
+            if freqs is None: return  # 如果还没有数据，则返回
+
+            total_power_freq_range = (freqs >= 1) & (freqs <= 100)
+            total_power = np.trapezoid(avg_psd[total_power_freq_range], freqs[total_power_freq_range])
+
+            if total_power > 1e-12:
+                for name, (f_low, f_high, color) in self.rhythm_bands.items():
+                    band_mask = (freqs >= f_low) & (freqs < f_high)
+                    band_power = np.trapezoid(avg_psd[band_mask], freqs[band_mask])
+                    relative_power = (band_power / total_power) * 100
+                    self.rhythm_progress_bars[name].setValue(int(relative_power))
+        else:
+            # 如果所有通道都被隐藏了，则清空能量条
+            for name in self.rhythm_bands:
+                self.rhythm_progress_bars[name].setValue(0)
 
     def start_monitoring(self):
         """启动后台线程并开始UI更新 """
@@ -500,6 +652,27 @@ class MainWindow(QMainWindow):
         """定时器调用的更新函数 """
         if self.is_offline_mode:
             return
+
+        if self.is_overlay_mode:
+            for i in range(NUM_CHANNELS):
+                # 只更新可见通道
+                if not self.channel_buttons[i].isChecked():
+                    self.overlay_curves[i].clear()  # 隐藏曲线
+                    self.overlay_ch_labels[i].setVisible(False)
+                    continue
+
+                self.overlay_ch_labels[i].setVisible(True)
+                current_data = self.filtered_data_queues[i]
+                num_samples = len(current_data)
+
+                if num_samples > 0:
+                    data_copy = np.array(current_data)
+                    # --- 核心: 添加Y轴偏移 ---
+                    offset_data = data_copy - i * self.OVERLAY_CHANNEL_OFFSET
+                    time_data_subset = self.time_axis[-num_samples:]
+                    self.overlay_curves[i].setData(x=time_data_subset, y=offset_data)
+            return  # 更新完叠加图后直接返回
+
         # 准备用于计算平均功率的变量
         psd_list_for_avg = []
 
@@ -581,52 +754,93 @@ class MainWindow(QMainWindow):
                 self.return_to_live_mode()  # 如果出错，尝试恢复到实时模式
 
     def plot_offline_data(self, mat_data):
-        """将从.mat文件加载的数据绘制到图表上"""
+        """将从.mat文件加载的数据绘制到图表上 (支持双视图模式)"""
         try:
-            fs_val = mat_data.get('fs')
-            if fs_val is not None:
-                fs = fs_val[0, 0]
-            else:
-                fs = self.SAMPLES_PER_SECOND
+            fs = mat_data.get('fs', [[self.SAMPLES_PER_SECOND]])[0, 0]
             events = mat_data.get('events', np.array([]))
 
-            # 绘制前先清空所有图表
+            if 'channel_order' in mat_data:
+                loaded_channel_names = [str(name).strip() for name in mat_data['channel_order'].flatten()]
+            else:
+                loaded_channel_names = [f'CH{i + 1}' for i in range(NUM_CHANNELS)]
+
             self.clear_all_plots()
 
+            # 更新UI和内部数据以匹配加载的通道名称
+            self.channel_names = loaded_channel_names + [f"CH{i + 1}" for i in
+                                                         range(len(loaded_channel_names), NUM_CHANNELS)]
+
             for i in range(NUM_CHANNELS):
-                ch_name = f'CH{i + 1}'
+                ch_name = self.channel_names[i]
+
+                # 1. 更新UI标题和标签
+                self.channel_buttons[i].setText(ch_name)
+                time_plot, freq_plot = self.plot_widgets_per_channel[i]
+                time_plot.setTitle(f"{ch_name} - Time Domain")
+                freq_plot.setTitle(f"{ch_name} - Frequency Domain")
+                self.overlay_ch_labels[i].setText(ch_name)  # 更新叠加图标签
+
                 if ch_name in mat_data:
                     ch_data = mat_data[ch_name].flatten()
                     num_samples = len(ch_data)
                     if num_samples == 0: continue
 
-                    # 1. 绘制时域图
                     time_axis_offline = np.arange(num_samples) / fs
+
+                    # --- 2. 绘制多图模式 ---
                     self.time_curves[i].setData(x=time_axis_offline, y=ch_data)
                     self.time_plots[i].setXRange(0, time_axis_offline[-1])
 
-                    # 2. 绘制事件标记
+                    # --- 3. 绘制叠加图模式 ---
+                    # ** 核心新增部分 **
+                    offset_data = ch_data - i * self.OVERLAY_CHANNEL_OFFSET
+                    self.overlay_curves[i].setData(x=time_axis_offline, y=offset_data)
+
+                    # --- 4. 在两种视图上都绘制事件标记 ---
                     if events.size > 0:
                         for event_info in events:
-                            # 兼容不同格式的 event_info
                             if isinstance(event_info, (list, np.ndarray)) and len(event_info) >= 2:
-                                event_time_raw = event_info[0]
+                                event_time_raw, event_label_raw = event_info[0], event_info[1]
                                 event_time = float(
                                     np.isscalar(event_time_raw) and event_time_raw or event_time_raw.item())
-                                event_label_raw = event_info[1]
                                 event_label = str(
                                     np.isscalar(event_label_raw) and event_label_raw or event_label_raw.item())
-                                event_line = pg.InfiniteLine(pos=float(event_time), angle=90, movable=False,
-                                                             pen=pg.mkPen('g', width=2, style=Qt.PenStyle.DashLine),
-                                                             label=str(event_label))
-                                self.time_plots[i].addItem(event_line)
 
-                    # 3. 绘制频域图
+                                # 在多图上添加标记
+                                event_line_multi = pg.InfiniteLine(pos=event_time, angle=90, movable=False,
+                                                                   pen=pg.mkPen('g', width=2,
+                                                                                style=Qt.PenStyle.DashLine),
+                                                                   label=event_label)
+                                self.time_plots[i].addItem(event_line_multi)
+
+                                # ** 新增: 在叠加图上也添加标记 **
+                                event_line_overlay = pg.InfiniteLine(pos=event_time, angle=90, movable=False,
+                                                                     pen=pg.mkPen('g', width=2,
+                                                                                  style=Qt.PenStyle.DashLine),
+                                                                     label=event_label)
+                                self.overlay_plot_widget.addItem(event_line_overlay)
+
+                    # --- 5. 绘制频域图 (这部分不变) ---
                     freqs, psd = signal.welch(ch_data - np.mean(ch_data), fs=fs, nperseg=min(num_samples, 2048))
                     freq_mask = freqs <= MAX_FREQ_TO_SHOW
                     self.freq_curves[i].setData(x=freqs[freq_mask], y=psd[freq_mask])
 
-            print("Offline data plotted successfully.")
+            # --- 6. 统一设置叠加图的X轴范围 ---
+            # ** 新增部分 **
+            if 'CH1' in mat_data or (len(loaded_channel_names) > 0 and loaded_channel_names[0] in mat_data):
+                # 以第一个通道的数据长度为准来设置X轴
+                first_ch_name = loaded_channel_names[0]
+                num_samples_first_ch = len(mat_data[first_ch_name].flatten())
+                max_time = num_samples_first_ch / fs
+                self.overlay_plot_widget.setXRange(0, max_time)
+                # 更新叠加图标签的位置
+                for i in range(NUM_CHANNELS):
+                    label_y_pos = -i * self.OVERLAY_CHANNEL_OFFSET
+                    self.overlay_ch_labels[i].setPos(0, label_y_pos)
+
+            self.recalculate_offline_psd_and_rhythms()
+
+            print("Offline data plotted successfully for both view modes.")
         except Exception as e:
             print(f"An error occurred during offline plotting: {e}")
 
