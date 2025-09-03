@@ -20,6 +20,7 @@ import time
 from scipy import signal
 import os
 import sys
+import scipy.io as sio
 
 import backend
 
@@ -119,8 +120,9 @@ class MainWindow(QMainWindow):
         # --- 队列初始化 ---
         self.recording_event = threading.Event()
         self.storage_queue = Queue()
-        # self.command_queue_ble = Queue() # <--- 移除
-        self.command_queue_filter = Queue()  # <--- 保留这个
+        # self.command_queue_ble = Queue()
+        self.command_queue_filter = Queue()
+        self.raw_data_queue = Queue()
         self.marker_lines = []
         self.filtered_data_queues = [deque(maxlen=self.PLOT_SAMPLES) for _ in range(NUM_CHANNELS)]
         self.channel_colors = [
@@ -936,7 +938,7 @@ class MainWindow(QMainWindow):
                     else:
                         self.freq_curves[i].clear() # 如果没有PSD结果也清空
                 else:
-                    # --- 关键修复：隐藏时清空曲线 ---
+
                     self.time_curves[i].clear()
                     self.freq_curves[i].clear()
 

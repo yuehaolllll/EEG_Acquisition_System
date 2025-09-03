@@ -4,7 +4,7 @@ Yuehao
 """
 
 import queue
-import socket # <--- 使用 socket
+import socket
 import struct
 import numpy as np
 from collections import deque
@@ -13,13 +13,14 @@ from scipy.signal import butter, iirnotch, lfilter_zi, lfilter
 from queue import Queue
 import time
 import scipy.io as sio
+import os
 
 # --- 1. 配置区 ---
 # WiFi/Socket 配置
 HOST = '0.0.0.0'
 PORT = 8080
 
-# 数据帧和批处理配置 (与蓝牙版本保持一致)
+# 数据帧和批处理配置
 FRAME_SIZE = 27
 BATCH_SIZE = 10
 BATCH_HEADER = b'\xaa\xbb\xcc\xdd'
@@ -27,8 +28,8 @@ BATCH_HEADER_LEN = len(BATCH_HEADER)
 PAYLOAD_SIZE = FRAME_SIZE * BATCH_SIZE
 NUM_CHANNELS = 8
 SAMPLES_PER_SECOND = 250
-V_REF = 5.0  # 注意：这里使用了蓝牙版本的值，请确认是否与WiFi硬件匹配
-GAIN = 24.0  # 注意：这里使用了蓝牙版本的值，请确认是否与WiFi硬件匹配
+V_REF = 5.0
+GAIN = 24.0
 LSB_TO_UV = (V_REF / GAIN / (2**23 - 1)) * 1000000.0
 
 # 滤波器配置
@@ -172,12 +173,103 @@ def filter_worker(raw_data_queue, filtered_data_queues, storage_queue, command_q
             continue
     print("Filter worker thread finished.")
 
+
 def data_storage_worker(storage_queue, recording_event):
-    # (此函数与你最新的蓝牙版本完全相同，直接复制过来即可)
+    """
+    数据存储线程 (修复版)
+    """
     print("Starting data storage thread...")
-    # ... (此处省略与蓝牙版本完全相同的代码) ...
-    # ... (请将你最新的 data_storage_worker 代码粘贴到这里) ...
-    pass # 临时占位符
+    channel_names_for_saving = [f'CH{i + 1}' for i in range(NUM_CHANNELS)]
+    data_to_save = [[] for _ in range(NUM_CHANNELS)]
+    events_to_save = []
+    filename = None
+    is_file_open = False
+    recording_start_time = None
+    current_fs_for_saving = SAMPLES_PER_SECOND
+
+    while True:
+        try:
+            item = storage_queue.get(timeout=0.1)
+
+            # --- 简化消息处理逻辑 ---
+            command = item[0] if isinstance(item, tuple) else None
+
+            if command == 'DATA':
+                _, batch_data, fs = item
+                if recording_event.is_set():
+                    if not is_file_open:
+                        timestamp = time.strftime("%Y%m%d_%H%M%S")
+                        filename = f"data/EEG_data_{timestamp}.mat"
+                        print(f"Recording started. Saving to {filename}")
+                        is_file_open = True
+                        # 如果是第一个数据包，就用当前时间作为记录开始时间
+                        if recording_start_time is None:
+                            recording_start_time = time.time()
+
+                    for ch in range(NUM_CHANNELS):
+                        data_to_save[ch].extend(batch_data[ch])
+                    current_fs_for_saving = fs
+
+            elif command == 'MARKER':
+                if recording_event.is_set():
+                    # --- 关键修复 ---
+                    # 如果这是记录开始后的第一个事件（无论是数据还是标记）
+                    # 就用这个标记的绝对时间作为记录的开始时间
+                    if recording_start_time is None:
+                        recording_start_time = item[1]  # item[1] is event_time
+
+                    _, event_time, event_label = item
+                    relative_time = event_time - recording_start_time
+                    events_to_save.append([relative_time, event_label])
+                    print(f"Marker logged: '{event_label}' at {relative_time:.3f} seconds.")
+                else:
+                    print("Marker ignored (not recording).")
+
+            elif command == 'STOP_RECORDING' or item is None:  # Stop or Exit
+                if is_file_open and any(data_to_save):
+                    if command == 'STOP_RECORDING':
+                        channel_names_for_saving = item[1]
+
+                    print(
+                        f"Finalizing save to {filename} with names: {channel_names_for_saving} and FS: {current_fs_for_saving}")
+
+                    # 检查 data_to_save 的长度是否与 channel_names_for_saving 匹配
+                    num_channels_to_save = len(channel_names_for_saving)
+                    mat_data = {
+                        channel_names_for_saving[i]: np.array(data_to_save[i])
+                        for i in range(num_channels_to_save) if i < len(data_to_save) and data_to_save[i]
+                    }
+                    mat_data['fs'] = current_fs_for_saving
+                    mat_data['events'] = np.array(events_to_save, dtype=object)
+                    mat_data['channel_order'] = np.array(channel_names_for_saving, dtype=object)
+
+                    # 确保 'data' 目录存在
+                    if not os.path.exists('data'):
+                        os.makedirs('data')
+                    sio.savemat(filename, mat_data)
+                    print("File saved.")
+                else:
+                    print("Stop/Exit command received, but no data to save.")
+
+                # Reset for next recording
+                data_to_save = [[] for _ in range(NUM_CHANNELS)]
+                events_to_save = []
+                is_file_open = False
+                recording_start_time = None
+                channel_names_for_saving = [f'CH{i + 1}' for i in range(NUM_CHANNELS)]
+
+                if item is None:  # Exit command
+                    break
+
+        except queue.Empty:
+            continue
+        except Exception as e:
+            print(f"An error occurred in storage thread: {e}")
+            import traceback
+            traceback.print_exc()
+            break
+
+    print("Data storage thread finished.")
 
 # --- 5. 启动函数 (修改版) ---
 def start_backend_threads(raw_q, filtered_qs, storage_q, recording_event, cmd_q_filter):
